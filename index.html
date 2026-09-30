@@ -25,18 +25,6 @@
 </style>
 </head>
 <body>
-<section id="login" class="login">
-  <div class="login-card">
-    <div class="logo"><div class="logo-icon">FP</div> Ferretería Pro</div>
-    <h1>Iniciar sesión</h1>
-    <p>Accede al sistema de gestión de tu ferretería.</p>
-    <div class="field"><label>Usuario</label><input id="loginUser" value="admin"></div>
-    <div class="field"><label>Contraseña</label><input id="loginPass" type="password" value="admin"></div>
-    <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="login()">Ingresar</button>
-    <p style="font-size:12px;margin-top:15px">Demo: admin / admin</p>
-  </div>
-</section>
-
 <div id="app" class="app">
 <aside class="sidebar">
   <div class="brand"><span>FP</span> Ferretería Pro</div>
@@ -255,8 +243,6 @@ function closeModal(){document.getElementById("modal").classList.remove("show")}
 document.addEventListener("click",e=>{if(e.target.matches(".modal"))closeModal()});
 document.querySelectorAll(".nav-btn").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
 const received=document.getElementById("amountReceived");if(received)received.addEventListener("input",updateChange);
-if(localStorage.getItem("ferreLogin"))showApp();
-else{document.getElementById("login").classList.remove("hidden");document.getElementById("app").classList.remove("active")}
-</script>
+showApp();</script>
 </body>
 </html>
