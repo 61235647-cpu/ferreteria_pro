@@ -30,6 +30,54 @@
 .modal{position:fixed;inset:0;background:rgba(16,24,40,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:20px;z-index:100}.modal.show{display:flex}.modal-box{width:min(620px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:14px;box-shadow:0 24px 70px rgba(0,0,0,.18);padding:20px}.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.modal-head h3{margin:0;font-size:16px}.close{width:30px;height:30px;border:0;border-radius:7px;background:#f2f4f7;color:#475467;font-size:18px}.invoice{border:1px solid var(--line);border-radius:9px;padding:18px}.invoice h3{text-align:center;margin:0 0 15px}.notice{padding:10px 12px;border:1px solid #dbeafe;background:#eff6ff;color:#24567e;border-radius:8px;font-size:10px;margin-bottom:12px}.config-row{display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:1px solid var(--line)}.empty{padding:35px;text-align:center;color:#98a2b3;font-size:11px}
 @media(max-width:1100px){.cards{grid-template-columns:repeat(2,1fr)}.sale-layout,.grid2{grid-template-columns:1fr}.products-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:720px){.sidebar{position:relative;width:100%;height:auto;min-height:auto}.main{margin-left:0;width:100%;padding:0 15px 25px}.app{display:block}.logout{position:static!important;margin-top:8px}.cards,.form-grid,.form-grid.three{grid-template-columns:1fr}.products-grid{grid-template-columns:1fr}.topbar{height:64px}.topbar h2{font-size:18px}}
+
+/* TEMA OSCURO SUAVE - pensado para reducir el brillo */
+:root{
+ --bg:#15171a;--surface:#1d2024;--surface2:#24282d;--ink:#e7e9ec;--muted:#a7adb7;
+ --line:#30353c;--primary:#5b8cff;--primary-dark:#4678ee;--nav:#101214;--nav2:#191c20;
+ --success:#39b878;--warning:#e0a24b;--danger:#e06b63;
+ --shadow:0 2px 10px rgba(0,0,0,.20);--r:12px
+}
+html,body{background:var(--bg);color:var(--ink)}
+.app{background:var(--bg)}
+.sidebar{background:var(--nav);border-right-color:#292d33}
+.sidebar .brand{color:#f1f3f5}
+.menu-title{color:#747b86}
+.nav-btn{color:#aeb5bf}
+.nav-btn:hover{background:#1c2025;color:#f1f3f5}
+.nav-btn.active{background:#365fca;color:#fff;box-shadow:0 4px 12px rgba(54,95,202,.22)}
+.main{background:var(--bg)}
+.topbar{border-bottom-color:var(--line)}
+.topbar h2{color:#f0f2f4}
+.user-chip{background:var(--surface);border-color:var(--line);color:#c3c8d0}
+.stat,.card,.product-card{background:var(--surface);border-color:var(--line);box-shadow:var(--shadow)}
+.stat small,.product-card p,.field label{color:var(--muted)}
+.stat strong,.product-card strong{color:#eef0f2}
+.stat .stat-meta{color:#55c58b}
+.toolbar input,.field input,.field select{background:#25292e;color:#e7e9ec;border-color:#3a4048}
+.toolbar input::placeholder,.field input::placeholder{color:#7f8792}
+.toolbar input:focus,.field input:focus,.field select:focus{border-color:#668ff0;box-shadow:0 0 0 3px rgba(91,140,255,.12)}
+.table-wrap{border-color:var(--line)}
+.table th{background:#24282d;color:#9da5b0}
+.table td{border-top-color:var(--line);color:#d2d6dc}
+.table tbody tr:hover{background:#23272c}
+.badge{background:#30353c;color:#cbd0d7}
+.badge.ok{background:#173a2a;color:#70d29e}.badge.low{background:#3b301d;color:#e5b66c}.badge.out{background:#3c211f;color:#e9867d}
+.btn-light{background:#292e34;border-color:#3b424b;color:#d8dce2}
+.btn-light:hover{background:#333940}
+.btn-warning{background:#3b301d;color:#e6b56a;border-color:#5b4828}
+.btn-danger{background:#3b211f;color:#ea8a82;border-color:#5b2f2b}
+.product-card:hover{border-color:#506da9;box-shadow:0 5px 18px rgba(0,0,0,.25)}
+.modal{background:rgba(0,0,0,.68)}
+.modal-box{background:#1d2024;color:var(--ink);box-shadow:0 24px 70px rgba(0,0,0,.45)}
+.close{background:#2b3036;color:#cbd0d7}
+.invoice{border-color:var(--line)}
+.notice{background:#1b2d45;border-color:#29476d;color:#9fc0ee}
+.config-row{border-bottom-color:var(--line)}
+.empty{color:#858d98}
+.sale-layout .card{background:var(--surface)}
+.cart-line{border-bottom-color:var(--line)}
+
 </style>
 </head>
 <body>
