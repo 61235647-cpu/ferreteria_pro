@@ -135,27 +135,27 @@ body{letter-spacing:.01em}.topbar{position:sticky;top:0;z-index:10;background:rg
 .notice{line-height:1.6}.config-row input,.config-row select{background:#20242a;color:var(--ink);border:1px solid #363d46}.config-row input:focus,.config-row select:focus{outline:0;border-color:#668ff0;box-shadow:0 0 0 3px var(--focus)}
 .modal-box{animation:modalIn .16s ease-out}@keyframes modalIn{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:none}}
 @media(max-width:720px){.topbar{position:static}.topbar h2{font-size:18px}.sale-layout>.card:first-child .card-head{display:block}.sale-layout>.card:first-child .card-head>div{max-width:none;margin-top:10px}.table th,.table td{padding:0 9px}.table td:last-child .btn{margin:2px 0}}
-</style></style>
+</style>
 </head>
 <body>
 <div id="app" class="app">
 <aside class="sidebar">
   <div class="brand"><span>FP</span> Ferretería Pro</div>
   <div class="menu-title">Principal</div>
-  <button class="nav-btn active" data-page="dashboard"><span class="ico">IN</span> Inicio</button>
-  <button class="nav-btn" data-page="ventas"><span class="ico">VT</span> Nueva venta</button>
+  <button type="button" class="nav-btn active" data-page="dashboard" onclick="showPage('dashboard')"><span class="ico">IN</span> Inicio</button>
+  <button type="button" class="nav-btn" data-page="ventas" onclick="showPage('ventas')"><span class="ico">VT</span> Nueva venta</button>
   <div class="menu-title">Gestión</div>
-  <button class="nav-btn" data-page="productos"><span class="ico">PR</span> Productos</button>
-  <button class="nav-btn" data-page="clientes"><span class="ico">CL</span> Clientes</button>
-  <button class="nav-btn" data-page="empleados"><span class="ico">US</span> Empleados</button>
-  <button class="nav-btn" data-page="proveedores"><span class="ico">PV</span> Proveedores</button>
-  <button class="nav-btn" data-page="compras"><span class="ico">CO</span> Compras</button>
-  <button class="nav-btn" data-page="inventario"><span class="ico">ST</span> Inventario</button>
-  <button class="nav-btn" data-page="usuarios"><span class="ico">US</span> Usuarios y roles</button>
+  <button type="button" class="nav-btn" data-page="productos" onclick="showPage('productos')"><span class="ico">PR</span> Productos</button>
+  <button type="button" class="nav-btn" data-page="clientes" onclick="showPage('clientes')"><span class="ico">CL</span> Clientes</button>
+  <button type="button" class="nav-btn" data-page="empleados" onclick="showPage('empleados')"><span class="ico">US</span> Empleados</button>
+  <button type="button" class="nav-btn" data-page="proveedores" onclick="showPage('proveedores')"><span class="ico">PV</span> Proveedores</button>
+  <button type="button" class="nav-btn" data-page="compras" onclick="showPage('compras')"><span class="ico">CO</span> Compras</button>
+  <button type="button" class="nav-btn" data-page="inventario" onclick="showPage('inventario')"><span class="ico">ST</span> Inventario</button>
+  <button type="button" class="nav-btn" data-page="usuarios" onclick="showPage('usuarios')"><span class="ico">US</span> Usuarios y roles</button>
   <div class="menu-title">Sistema</div>
-  <button class="nav-btn" data-page="documentos"><span class="ico">DC</span> Comprobantes</button>
-  <button class="nav-btn" data-page="reportes"><span class="ico">RP</span> Reportes</button>
-  <button class="nav-btn" data-page="config"><span class="ico">CF</span> Configuración</button>
+  <button type="button" class="nav-btn" data-page="documentos" onclick="showPage('documentos')"><span class="ico">DC</span> Comprobantes</button>
+  <button type="button" class="nav-btn" data-page="reportes" onclick="showPage('reportes')"><span class="ico">RP</span> Reportes</button>
+  <button type="button" class="nav-btn" data-page="config" onclick="showPage('config')"><span class="ico">CF</span> Configuración</button>
   <button class="nav-btn logout" onclick="logout()"><span class="ico">SAL</span> Cerrar sesión</button>
 </aside>
 
@@ -391,7 +391,7 @@ function resetData(){if(confirm("¿Restaurar datos demo?")){data=JSON.parse(JSON
 function openModal(){document.getElementById("modal").classList.add("show")}
 function closeModal(){document.getElementById("modal").classList.remove("show")}
 document.addEventListener("click",e=>{if(e.target.matches(".modal"))closeModal()});
-document.querySelectorAll(".nav-btn").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
+
 const received=document.getElementById("received");if(received)received.addEventListener("input",updateChange);renderDocumentFields();
 showApp();</script>
 </body>
