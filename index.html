@@ -5,66 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ferretería Pro</title>
 <style>
-:root{
-  --primary:#1f4e79;--primary2:#163a5c;--accent:#f4b400;--bg:#f3f6f9;
-  --card:#fff;--text:#1d2733;--muted:#718096;--border:#e1e7ee;
-  --success:#1f9d55;--danger:#d64545;--shadow:0 8px 24px rgba(20,45,70,.08)
-}
-*{box-sizing:border-box}
-body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
-button,input,select{font:inherit}
-button{cursor:pointer;border:0}
-.hidden{display:none!important}
-.login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#163a5c,#2d6da3)}
-.login-card{width:390px;background:#fff;border-radius:18px;padding:36px;box-shadow:0 25px 70px rgba(0,0,0,.2)}
-.logo{display:flex;align-items:center;gap:12px;font-weight:800;font-size:25px;color:var(--primary)}
-.logo-icon{width:48px;height:48px;border-radius:12px;background:var(--accent);display:grid;place-items:center;color:#222;font-size:24px}
-.login-card h1{margin:24px 0 6px}.login-card p{color:var(--muted);margin-top:0}
-.field{margin:14px 0}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
-.field input,.field select{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:9px;outline:none;background:#fff}
-.field input:focus,.field select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(31,78,121,.1)}
-.btn{padding:10px 15px;border-radius:9px;font-weight:700}
-.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary2)}
-.btn-warning{background:var(--accent);color:#222}.btn-danger{background:var(--danger);color:#fff}
-.btn-light{background:#eef3f7;color:var(--text)}.btn-success{background:var(--success);color:#fff}
-.app{display:none;min-height:100vh}.app.active{display:flex}
-.sidebar{width:245px;background:#163a5c;color:#fff;min-height:100vh;position:fixed;left:0;top:0;bottom:0;padding:20px 14px;z-index:10}
-.sidebar .brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800;padding:7px 9px 24px}
-.sidebar .brand span{background:var(--accent);color:#222;border-radius:9px;padding:8px}
-.menu-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#a9bfd3;margin:15px 10px 7px}
-.nav-btn{width:100%;display:flex;gap:11px;align-items:center;padding:11px 12px;background:transparent;color:#dce8f2;border-radius:9px;text-align:left;margin:3px 0}
-.nav-btn:hover,.nav-btn.active{background:#28577f;color:#fff}.nav-btn .ico{width:22px;text-align:center}
-.logout{position:absolute;left:14px;right:14px;bottom:20px}
-.main{margin-left:245px;width:calc(100% - 245px);padding:22px 28px}
-.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
-.topbar h2{margin:0}.user-chip{background:#fff;border:1px solid var(--border);padding:8px 12px;border-radius:20px;font-size:13px}
-.page{display:none}.page.active{display:block}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
-.stat{background:#fff;border-radius:13px;padding:18px;box-shadow:var(--shadow);border:1px solid var(--border)}
-.stat small{color:var(--muted)}.stat strong{display:block;font-size:27px;margin-top:7px}
-.grid2{display:grid;grid-template-columns:1.3fr .7fr;gap:18px}
-.card{background:#fff;border:1px solid var(--border);border-radius:13px;padding:18px;box-shadow:var(--shadow)}
-.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}.card-head h3{margin:0}
-.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:11px 10px;border-bottom:1px solid var(--border);text-align:left;font-size:13px}.table th{background:#f7f9fb;color:#526477}
-.badge{display:inline-block;padding:4px 8px;border-radius:20px;font-size:11px;font-weight:700;background:#eaf0f5}
-.badge.ok{background:#e4f6eb;color:#19733e}.badge.low{background:#fff0d5;color:#986500}.badge.out{background:#fde7e7;color:#a62929}
-.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:15px}.toolbar input{flex:1;min-width:190px;padding:10px 12px;border:1px solid var(--border);border-radius:9px}
-.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.form-grid.three{grid-template-columns:repeat(3,1fr)}
-.actions{display:flex;gap:6px;flex-wrap:wrap}.empty{padding:35px;text-align:center;color:var(--muted)}
-.sale-layout{display:grid;grid-template-columns:1.5fr .8fr;gap:18px}.products-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-height:520px;overflow:auto}
-.product-card{border:1px solid var(--border);border-radius:11px;padding:13px;background:#fff}.product-card h4{margin:0 0 7px}.product-card p{margin:4px 0;color:var(--muted);font-size:12px}.product-card strong{font-size:17px}.cart-line{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
-.total{font-size:21px;font-weight:800;display:flex;justify-content:space-between;margin-top:15px}.modal{position:fixed;inset:0;background:rgba(10,25,40,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}.modal.show{display:flex}.modal-box{background:#fff;border-radius:15px;width:min(650px,100%);padding:22px;max-height:90vh;overflow:auto}.modal-head{display:flex;justify-content:space-between;align-items:center}.modal-head h3{margin:0}.close{background:#eef3f7;border-radius:50%;width:32px;height:32px}
-.invoice{border:1px dashed #b9c5d0;padding:20px;background:#fff;margin-top:15px}.invoice h3{text-align:center;margin:0 0 12px}
-.notice{padding:10px 12px;border-radius:8px;background:#edf5ff;color:#24567e;font-size:13px;margin-bottom:15px}
-.config-row{display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:1px solid var(--border)}
-@media(max-width:1000px){.sidebar{width:205px}.main{margin-left:205px;width:calc(100% - 205px)}.cards{grid-template-columns:repeat(2,1fr)}.sale-layout,.grid2{grid-template-columns:1fr}.products-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:700px){.sidebar{position:relative;width:100%;min-height:auto}.main{margin-left:0;width:100%}.app.active{display:block}.sidebar .logout{position:static;margin-top:10px}.form-grid,.form-grid.three{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.products-grid{grid-template-columns:1fr}}
+:root{--navy:#0b1f33;--navy2:#102d47;--blue:#2563eb;--blue2:#1d4ed8;--cyan:#0ea5e9;--bg:#f5f7fb;--surface:#fff;--line:#e6ebf2;--text:#172033;--muted:#6b778c;--green:#16a34a;--red:#dc2626;--amber:#d97706;--shadow:0 8px 30px rgba(15,35,55,.06);--radius:14px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);font-size:14px}button,input,select{font:inherit}button{cursor:pointer;border:0}.hidden{display:none!important}
+.login{min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 80% 10%,#173f65 0,#0b1f33 42%,#071522 100%);padding:24px}
+.login-card{width:min(410px,100%);background:rgba(255,255,255,.98);border:1px solid rgba(255,255,255,.2);border-radius:22px;padding:38px;box-shadow:0 30px 80px rgba(0,0,0,.25)}
+.logo{display:flex;align-items:center;gap:12px;font-weight:800;font-size:24px;color:var(--navy)}.logo-icon{width:48px;height:48px;border-radius:14px;background:var(--blue);display:grid;place-items:center;color:#fff;font-size:20px}.login-card h1{margin:26px 0 7px;font-size:28px}.login-card p{color:var(--muted);margin-top:0;line-height:1.5}
+.field{margin:14px 0}.field label{display:block;font-size:12px;font-weight:750;color:#46546a;margin-bottom:7px}.field input,.field select{width:100%;padding:12px 13px;border:1px solid #d9e0ea;border-radius:10px;outline:none;background:#fff;color:var(--text);transition:.2s}.field input:focus,.field select:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.09)}
+.btn{padding:10px 14px;border-radius:10px;font-weight:700;transition:.18s;border:1px solid transparent}.btn:hover{transform:translateY(-1px)}.btn-primary{background:var(--blue);color:#fff;box-shadow:0 5px 12px rgba(37,99,235,.18)}.btn-primary:hover{background:var(--blue2)}.btn-warning{background:#fff7ed;color:#b45309;border-color:#fed7aa}.btn-danger{background:#fff1f2;color:#be123c;border-color:#fecdd3}.btn-light{background:#f4f6f9;color:#344054;border-color:#e2e7ef}.btn-success{background:var(--green);color:#fff;box-shadow:0 5px 12px rgba(22,163,74,.16)}
+.app{display:none;min-height:100vh}.app.active{display:flex}.sidebar{width:258px;background:linear-gradient(180deg,var(--navy),#0c263d);color:#fff;min-height:100vh;position:fixed;left:0;top:0;bottom:0;padding:22px 14px;z-index:10;border-right:1px solid rgba(255,255,255,.05)}.sidebar .brand{display:flex;align-items:center;gap:11px;font-size:20px;font-weight:800;padding:4px 10px 25px}.sidebar .brand span{background:var(--blue);color:#fff;border-radius:11px;padding:9px;font-size:15px}.menu-title{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:#7f96ad;margin:18px 10px 8px}.nav-btn{width:100%;display:flex;gap:12px;align-items:center;padding:11px 12px;background:transparent;color:#b8c8d8;border-radius:10px;text-align:left;margin:3px 0;font-weight:600}.nav-btn:hover{background:rgba(255,255,255,.06);color:#fff}.nav-btn.active{background:linear-gradient(90deg,#2563eb,#1d4ed8);color:#fff;box-shadow:0 7px 18px rgba(37,99,235,.2)}.nav-btn .ico{width:22px;height:22px;display:grid;place-items:center;border-radius:6px;background:rgba(255,255,255,.08);font-size:10px;font-weight:800}.logout{position:absolute;left:14px;right:14px;bottom:18px}
+.main{margin-left:258px;width:calc(100% - 258px);padding:24px 30px 40px}.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:25px}.topbar h2{margin:0;font-size:23px;letter-spacing:-.4px}.user-chip{background:#fff;border:1px solid var(--line);padding:9px 13px;border-radius:999px;font-size:12px;font-weight:700;color:#435167;box-shadow:0 3px 12px rgba(20,40,60,.04)}
+.page{display:none}.page.active{display:block}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:19px;box-shadow:var(--shadow);position:relative;overflow:hidden}.stat:after{content:"";position:absolute;right:-20px;top:-20px;width:70px;height:70px;background:#eff6ff;border-radius:50%}.stat small{color:var(--muted);font-weight:600}.stat strong{display:block;font-size:27px;margin-top:9px;letter-spacing:-.5px;position:relative;z-index:1}
+.grid2{display:grid;grid-template-columns:1.35fr .65fr;gap:18px}.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:19px;box-shadow:var(--shadow)}.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:17px}.card-head h3{margin:0;font-size:16px;letter-spacing:-.2px}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:11px}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:13px 12px;border-bottom:1px solid var(--line);text-align:left;font-size:12px;white-space:nowrap}.table th{background:#f8fafc;color:#68768a;font-size:11px;text-transform:uppercase;letter-spacing:.45px}.table tbody tr:hover{background:#fafcff}.table tbody tr:last-child td{border-bottom:0}
+.badge{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;font-size:10px;font-weight:800;background:#eef2f7;color:#526174}.badge.ok{background:#eaf8ef;color:#15803d}.badge.low{background:#fff7e8;color:#b45309}.badge.out{background:#fff0f1;color:#be123c}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}.toolbar input{flex:1;min-width:190px;padding:11px 13px;border:1px solid #dce3ec;border-radius:10px;outline:none}.toolbar input:focus{border-color:var(--blue)}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.form-grid.three{grid-template-columns:repeat(3,1fr)}.actions{display:flex;gap:6px;flex-wrap:wrap}.empty{padding:35px;text-align:center;color:var(--muted)}
+.sale-layout{display:grid;grid-template-columns:1.45fr .75fr;gap:18px}.products-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;max-height:550px;overflow:auto}.product-card{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff;transition:.18s}.product-card:hover{border-color:#b9cdfc;box-shadow:0 8px 20px rgba(37,99,235,.08);transform:translateY(-1px)}.product-card h4{margin:0 0 8px;font-size:13px}.product-card p{margin:5px 0;color:var(--muted);font-size:11px}.product-card strong{font-size:17px;color:var(--navy)}
+.cart-line{display:flex;justify-content:space-between;gap:8px;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px}.total{font-size:21px;font-weight:850;display:flex;justify-content:space-between;margin-top:16px}.invoice{border:1px dashed #b9c5d0;padding:20px;background:#fff;margin-top:15px}.invoice h3{text-align:center;margin:0 0 12px}.modal{position:fixed;inset:0;background:rgba(5,20,35,.62);display:none;align-items:center;justify-content:center;z-index:50;padding:20px;backdrop-filter:blur(3px)}.modal.show{display:flex}.modal-box{background:#fff;border-radius:17px;width:min(650px,100%);padding:23px;max-height:90vh;overflow:auto;box-shadow:0 25px 70px rgba(0,0,0,.2)}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}.modal-head h3{margin:0;font-size:18px}.close{background:#f1f4f8;color:#526174;border-radius:50%;width:32px;height:32px;font-size:20px}.notice{padding:11px 13px;border-radius:10px;background:#eff6ff;color:#24567e;font-size:12px;margin-bottom:15px;border:1px solid #dbeafe}.config-row{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:16px 0;border-bottom:1px solid var(--line)}
+@media(max-width:1050px){.sidebar{width:215px}.main{margin-left:215px;width:calc(100% - 215px)}.cards{grid-template-columns:repeat(2,1fr)}.sale-layout,.grid2{grid-template-columns:1fr}.products-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:700px){.sidebar{position:relative;width:100%;min-height:auto}.main{margin-left:0;width:100%;padding:18px}.app.active{display:block}.sidebar .logout{position:static;margin-top:10px}.form-grid,.form-grid.three{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.products-grid{grid-template-columns:1fr}.topbar{align-items:flex-start;gap:12px}.topbar h2{font-size:20px}}
 </style>
 </head>
 <body>
 <section id="login" class="login">
   <div class="login-card">
-    <div class="logo"><div class="logo-icon">🔨</div> Ferretería Pro</div>
+    <div class="logo"><div class="logo-icon">FP</div> Ferretería Pro</div>
     <h1>Iniciar sesión</h1>
     <p>Accede al sistema de gestión de tu ferretería.</p>
     <div class="field"><label>Usuario</label><input id="loginUser" value="admin"></div>
@@ -76,23 +39,26 @@ button{cursor:pointer;border:0}
 
 <div id="app" class="app">
 <aside class="sidebar">
-  <div class="brand"><span>🔨</span> Ferretería Pro</div>
+  <div class="brand"><span>FP</span> Ferretería Pro</div>
   <div class="menu-title">Principal</div>
-  <button class="nav-btn active" data-page="dashboard"><span class="ico">🏠</span> Inicio</button>
-  <button class="nav-btn" data-page="ventas"><span class="ico">🛒</span> Nueva venta</button>
+  <button class="nav-btn active" data-page="dashboard"><span class="ico">IN</span> Inicio</button>
+  <button class="nav-btn" data-page="ventas"><span class="ico">VT</span> Nueva venta</button>
   <div class="menu-title">Gestión</div>
-  <button class="nav-btn" data-page="productos"><span class="ico">📦</span> Productos</button>
-  <button class="nav-btn" data-page="clientes"><span class="ico">👥</span> Clientes</button>
-  <button class="nav-btn" data-page="empleados"><span class="ico">👤</span> Empleados</button>
-  <button class="nav-btn" data-page="proveedores"><span class="ico">🚚</span> Proveedores</button>\n  <button class="nav-btn" data-page="compras"><span class="ico">🧾</span> Compras</button>\n  <button class="nav-btn" data-page="inventario"><span class="ico">📋</span> Inventario</button>\n  <button class="nav-btn" data-page="usuarios"><span class="ico">🔐</span> Usuarios y roles</button>
+  <button class="nav-btn" data-page="productos"><span class="ico">PR</span> Productos</button>
+  <button class="nav-btn" data-page="clientes"><span class="ico">CL</span> Clientes</button>
+  <button class="nav-btn" data-page="empleados"><span class="ico">US</span> Empleados</button>
+  <button class="nav-btn" data-page="proveedores"><span class="ico">PV</span> Proveedores</button>
+  <button class="nav-btn" data-page="compras"><span class="ico">CO</span> Compras</button>
+  <button class="nav-btn" data-page="inventario"><span class="ico">ST</span> Inventario</button>
+  <button class="nav-btn" data-page="usuarios"><span class="ico">US</span> Usuarios y roles</button>
   <div class="menu-title">Sistema</div>
-  <button class="nav-btn" data-page="reportes"><span class="ico">📊</span> Reportes</button>
-  <button class="nav-btn" data-page="config"><span class="ico">⚙️</span> Configuración</button>
-  <button class="nav-btn logout" onclick="logout()"><span class="ico">↪</span> Cerrar sesión</button>
+  <button class="nav-btn" data-page="reportes"><span class="ico">RP</span> Reportes</button>
+  <button class="nav-btn" data-page="config"><span class="ico">CF</span> Configuración</button>
+  <button class="nav-btn logout" onclick="logout()"><span class="ico">SAL</span> Cerrar sesión</button>
 </aside>
 
 <main class="main">
-  <div class="topbar"><h2 id="pageTitle">Inicio</h2><div class="user-chip">👤 <span id="currentUserName">Administrador</span></div></div>
+  <div class="topbar"><h2 id="pageTitle">Inicio</h2><div class="user-chip">US <span id="currentUserName">Administrador</span></div></div>
 
   <section id="dashboard" class="page active">
     <div class="cards">
@@ -194,7 +160,9 @@ const seed={
  sales:[]
 };
 let data=JSON.parse(localStorage.getItem('ferreteriaProData'))||seed;
-data.users=data.users||seed.users;data.purchases=data.purchases||[];data.movements=data.movements||[];\ndata.users=data.users||[{id:1,username:'admin',name:'Administrador',role:'Administrador',status:'Activo'}];\ndata.purchases=data.purchases||[]; data.movements=data.movements||[];
+data.users=data.users||seed.users;data.purchases=data.purchases||[];data.movements=data.movements||[];
+data.users=data.users||[{id:1,username:'admin',name:'Administrador',role:'Administrador',status:'Activo'}];
+data.purchases=data.purchases||[]; data.movements=data.movements||[];
 let cart=[];
 const money=n=>'S/ '+Number(n||0).toFixed(2);
 const save=()=>localStorage.setItem('ferreteriaProData',JSON.stringify(data));
@@ -214,7 +182,10 @@ function showPage(id){
  document.getElementById('pageTitle').textContent=titles[id];
  if(id==='ventas')renderSale();
  if(id==='reportes')renderReports();
- if(id==='dashboard')renderDashboard();\n if(id==='compras')renderPurchases();\n if(id==='inventario')renderInventory();\n if(id==='usuarios')renderUsers();
+ if(id==='dashboard')renderDashboard();
+ if(id==='compras')renderPurchases();
+ if(id==='inventario')renderInventory();
+ if(id==='usuarios')renderUsers();
 }
 
 function refresh(){renderDashboard();renderProducts();renderClients();renderEmployees();renderSuppliers();renderSale();renderReports();renderPurchases();renderInventory();renderUsers()}
@@ -317,7 +288,9 @@ function renderReports(){
  document.getElementById('salesTable').innerHTML=data.sales.slice().reverse().map(s=>'<tr><td>'+new Date(s.date).toLocaleString()+'</td><td>'+esc(s.client)+'</td><td>'+esc(s.payment)+'</td><td>'+money(s.total)+'</td><td><button class="btn btn-light" onclick="viewSale('+s.id+')">Ver</button></td></tr>').join('')||'<tr><td colspan="5" class="empty">No hay ventas.</td></tr>';
 }
 function viewSale(id){const s=data.sales.find(x=>x.id===id);document.getElementById('modalTitle').textContent='Detalle de venta';document.getElementById('modalBody').innerHTML='<div class="invoice"><h3>FERRETERÍA PRO</h3><p><b>Fecha:</b> '+new Date(s.date).toLocaleString()+'</p><p><b>Cliente:</b> '+esc(s.client)+'</p><hr>'+s.items.map(i=>{const p=data.products.find(x=>x.id===i.id);return '<div class="cart-line"><span>'+esc(p?.name||'Producto')+' × '+i.qty+'</span><b>'+money((p?.price||0)*i.qty)+'</b></div>'}).join('')+'<div class="total"><span>Total</span><span>'+money(s.total)+'</span></div><button class="btn btn-primary" style="margin-top:15px;width:100%" onclick="printReceipt(data.sales.find(x=>x.id==='+s.id+'))">🖨️ Imprimir boleta / factura</button></div>';openModal()}
-function exportCSV(){let csv='Fecha,Cliente,Método de pago,Total\n'+data.sales.map(s=>[new Date(s.date).toLocaleString(),s.client,s.payment,s.total.toFixed(2)].map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='ventas-ferreteria-pro.csv';a.click()}
+function exportCSV(){let csv='Fecha,Cliente,Método de pago,Total
+'+data.sales.map(s=>[new Date(s.date).toLocaleString(),s.client,s.payment,s.total.toFixed(2)].map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('
+');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='ventas-ferreteria-pro.csv';a.click()}
 function saveConfig(){alert('Configuración guardada.')}
 function resetData(){if(confirm('Se borrarán los datos actuales y se restaurarán los datos demo.')){data=JSON.parse(JSON.stringify(seed));save();refresh();}}
 function field(label,id,value,type='text'){return '<div class="field"><label>'+label+'</label><input id="'+id+'" type="'+type+'" value="'+esc(String(value??''))+'"></div>'}
