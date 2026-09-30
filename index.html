@@ -295,7 +295,20 @@ function renderPeople(id,list,type){
 function openPerson(type,id){
  const map={client:["Cliente",data.clients],employee:["Empleado",data.employees],supplier:["Proveedor",data.suppliers]},m=map[type],x=m[1].find(a=>a.id===id)||{doc:"",name:"",phone:"",address:"",role:"Vendedor",status:"Activo",contact:""};
  document.getElementById("modalTitle").textContent=id?"Editar "+m[0].toLowerCase():"Nuevo "+m[0].toLowerCase();
- document.getElementById("modalBody").innerHTML='<div class="form-grid">'+field("Documento","xDoc",x.doc)+field("Nombre","xName",x.name)+field(type==="supplier"?"Contacto":"Teléfono","xPhone",type==="supplier"?x.contact:x.phone)+field(type==="client"?"Dirección":"Estado","xExtra",type==="client"?x.address:(x.status||"Activo"))+'</div><button class="btn btn-primary" onclick="savePerson('+"'"+type+"',"+(id||0)+')">Guardar</button>';openModal();
+ document.getElementById("modalBody").innerHTML='<div class="form-grid">'+field("Documento","xDoc",x.doc)+field("Nombre","xName",x.name)+field(type==="supplier"?"Contacto":"Teléfono","xPhone",type==="supplier"?x.contact:x.phone)+field(type==="client"?"Dirección":"Estado","xExtra",type==="client"?x.address:(x.status||"Activo"))+'</div>'+(type==="client"?'<div style="display:flex;gap:8px;margin:10px 0"><button class="btn btn-light" onclick="consultarDNI()">Consultar DNI</button><span id="dniStatus" style="color:var(--muted);align-self:center"></span></div>':'')+'<button class="btn btn-primary" onclick="savePerson('+"'"+type+"',"+(id||0)+')">Guardar</button>';openModal();
+}
+async function consultarDNI(inputId="xDoc",nameId="xName",statusId="dniStatus"){
+ const dni=String(v(inputId)||"").replace(/\D/g,""),status=document.getElementById(statusId);
+ if(!/^\d{8}$/.test(dni)){if(status)status.textContent="Ingresa un DNI válido de 8 dígitos.";return}
+ if(status)status.textContent="Consultando...";
+ try{
+  const r=await fetch("/api/dni",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({dni})});
+  const j=await r.json();if(!r.ok)throw new Error(j.message||"No se pudo consultar el DNI.");
+  const d=j.data||j,n=d.full_name||d.nombre_completo||[d.nombres,d.apellido_paterno,d.apellido_materno].filter(Boolean).join(" ");
+  if(!n)throw new Error("La consulta no devolvió el nombre.");
+  document.getElementById(inputId).value=dni;document.getElementById(nameId).value=n.toUpperCase();
+  if(status)status.textContent="Nombre encontrado.";
+ }catch(e){if(status)status.textContent=e.message||"Error en la consulta."}
 }
 function savePerson(type,id){
  const map={client:"clients",employee:"employees",supplier:"suppliers"},k=map[type],old=data[k].find(x=>x.id===id)||{};
@@ -323,7 +336,23 @@ function renderCart(){
  const total=cart.reduce((a,x)=>a+(data.products.find(p=>p.id===x.id).price*x.qty),0),t=document.getElementById("cartTotal");if(t)t.textContent=money(total);updateChange();
 }
 function updateChange(){const total=cart.reduce((a,x)=>a+(data.products.find(p=>p.id===x.id)?.price||0)*x.qty,0),rec=+(v("received")||0),e=document.getElementById("change");if(e)e.textContent=money(Math.max(0,rec-total))}
-function renderDocumentFields(){const e=document.getElementById("documentCustomerFields");if(!e)return;const type=v("documentType")||"BOLETA";e.innerHTML='<div class="form-grid"><div class="field"><label>Documento del cliente</label><input id="customerDoc" placeholder="'+(type==="FACTURA"?"RUC":"DNI / RUC")+'"></div><div class="field"><label>Dirección (opcional)</label><input id="customerAddress" placeholder="Dirección del cliente"></div></div>';document.getElementById("documentType")?.addEventListener("change",renderDocumentFields)}
+function renderDocumentFields(){const e=document.getElementById("documentCustomerFields");if(!e)return;const type=v("documentType")||"BOLETA";e.innerHTML='<div class="form-grid"><div class="field"><label>Documento del cliente</label><div style="display:flex;gap:8px"><input id="customerDoc" placeholder="'+(type==="FACTURA"?"RUC":"DNI / RUC")+'"><button class="btn btn-light" type="button" onclick="consultarDNIVenta()">Consultar DNI</button></div><span id="saleDniStatus" style="color:var(--muted);font-size:12px"></span></div><div class="field"><label>Nombre del cliente</label><input id="customerName" placeholder="Se completa al consultar"></div><div class="field"><label>Dirección (opcional)</label><input id="customerAddress" placeholder="Dirección del cliente"></div></div>';document.getElementById("documentType")?.addEventListener("change",renderDocumentFields)}
+async function consultarDNIVenta(){
+ const dni=String(v("customerDoc")||"").replace(/\D/g,""),status=document.getElementById("saleDniStatus");
+ if(!/^\d{8}$/.test(dni)){if(status)status.textContent="Ingresa un DNI válido de 8 dígitos.";return}
+ if(status)status.textContent="Consultando...";
+ try{
+  const r=await fetch("/api/dni",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({dni})});
+  const j=await r.json();if(!r.ok)throw new Error(j.message||"No se pudo consultar el DNI.");
+  const d=j.data||j,n=(d.full_name||d.nombre_completo||[d.nombres,d.apellido_paterno,d.apellido_materno].filter(Boolean).join(" ")).toUpperCase();
+  if(!n)throw new Error("La consulta no devolvió el nombre.");
+  document.getElementById("customerDoc").value=dni;document.getElementById("customerName").value=n;
+  let client=data.clients.find(x=>String(x.doc||"")===dni);
+  if(!client){client={id:Date.now(),doc:dni,name:n,phone:"",address:""};data.clients.push(client);save();}
+  const sel=document.getElementById("saleClient");if(sel){sel.innerHTML='<option value="0">Cliente general</option>'+data.clients.map(x=>'<option value="'+x.id+'">'+esc(x.name)+'</option>').join("");sel.value=client.id}
+  if(status)status.textContent="Cliente encontrado.";
+ }catch(e){if(status)status.textContent=e.message||"Error en la consulta."}
+}
 function nextDocumentNumber(type){const prefix=type==="FACTURA"?"F001":type==="BOLETA"?"B001":"NV01";const nums=data.documents.filter(d=>d.type===type).map(d=>parseInt((d.number||"").split("-")[1])||0);return prefix+"-"+String((Math.max(0,...nums)+1)).padStart(8,"0")}
 function finishSale(){
  if(!cart.length)return alert("Agrega productos.");const total=cart.reduce((a,x)=>a+data.products.find(p=>p.id===x.id).price*x.qty,0),received=+(v("received")||total);if(received<total)return alert("El monto recibido es menor al total.");
