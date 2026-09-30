@@ -92,7 +92,7 @@ button{cursor:pointer;border:0}
 </aside>
 
 <main class="main">
-  <div class="topbar"><h2 id="pageTitle">Inicio</h2><div class="user-chip">👤 Administrador</div></div>
+  <div class="topbar"><h2 id="pageTitle">Inicio</h2><div class="user-chip">👤 <span id="currentUserName">Administrador</span></div></div>
 
   <section id="dashboard" class="page active">
     <div class="cards">
@@ -146,6 +146,9 @@ button{cursor:pointer;border:0}
     </div>
   </section>
 
+<section id="compras" class="page"><div class="card"><div class="card-head"><h3>Compras a proveedores</h3><button class="btn btn-primary" onclick="openPurchase()">+ Nueva compra</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Fecha</th><th>Proveedor</th><th>Productos</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="purchasesTable"></tbody></table></div></div></section>
+<section id="inventario" class="page"><div class="cards"><div class="stat"><small>Entradas</small><strong id="stockInTotal">0</strong></div><div class="stat"><small>Salidas</small><strong id="stockOutTotal">0</strong></div><div class="stat"><small>Movimientos</small><strong id="movementTotal">0</strong></div></div><div class="card"><div class="card-head"><h3>Movimientos de inventario</h3><button class="btn btn-warning" onclick="openStockMovement()">+ Entrada manual</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Fecha</th><th>Producto</th><th>Tipo</th><th>Cantidad</th><th>Motivo</th><th>Usuario</th></tr></thead><tbody id="inventoryTable"></tbody></table></div></div></section>
+<section id="usuarios" class="page"><div class="card"><div class="card-head"><h3>Usuarios y roles</h3><button class="btn btn-primary" onclick="openUser()">+ Nuevo usuario</button></div><div class="notice">Roles: Administrador, Vendedor y Almacén.</div><div class="table-wrap"><table class="table"><thead><tr><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="usersTable"></tbody></table></div></div></section>
   <section id="reportes" class="page">
     <div class="cards"><div class="stat"><small>Total vendido</small><strong id="reportTotal">S/ 0.00</strong></div><div class="stat"><small>Número de ventas</small><strong id="reportCount">0</strong></div></div>
     <div class="card"><div class="card-head"><h3>Historial de ventas</h3><button class="btn btn-light" onclick="exportCSV()">Exportar CSV</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Fecha</th><th>Cliente</th><th>Pago</th><th>Total</th><th>Acciones</th></tr></thead><tbody id="salesTable"></tbody></table></div></div>
@@ -166,6 +169,8 @@ button{cursor:pointer;border:0}
 
 <script>
 const seed={
+ users:[{id:1,username:'admin',name:'Administrador',role:'Administrador',status:'Activo'}],
+ purchases:[],movements:[],
  products:[
   {id:1,sku:'FER-001',name:'Martillo de acero 16 oz',unit:'Unidad',stock:18,min:5,price:35},
   {id:2,sku:'FER-002',name:'Taladro eléctrico 650W',unit:'Unidad',stock:7,min:3,price:189.9},
@@ -188,16 +193,15 @@ const seed={
  ],
  sales:[]
 };
-let data=JSON.parse(localStorage.getItem('ferreteriaProData'))||seed;\ndata.users=data.users||[{id:1,username:'admin',name:'Administrador',role:'Administrador',status:'Activo'}];\ndata.purchases=data.purchases||[]; data.movements=data.movements||[];
+let data=JSON.parse(localStorage.getItem('ferreteriaProData'))||seed;
+data.users=data.users||seed.users;data.purchases=data.purchases||[];data.movements=data.movements||[];\ndata.users=data.users||[{id:1,username:'admin',name:'Administrador',role:'Administrador',status:'Activo'}];\ndata.purchases=data.purchases||[]; data.movements=data.movements||[];
 let cart=[];
 const money=n=>'S/ '+Number(n||0).toFixed(2);
 const save=()=>localStorage.setItem('ferreteriaProData',JSON.stringify(data));
 
-function login(){
- const u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value;
- if(u==='admin'&&p==='admin'){localStorage.setItem('ferreLogin','1');showApp()}else alert('Usuario o contraseña incorrectos. Demo: admin / admin');
-}
-function showApp(){document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.add('active');refresh()}
+let currentUser=JSON.parse(localStorage.getItem('ferreCurrentUser')||'null')||{username:'admin',name:'Administrador',role:'Administrador'};
+function login(){const u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value;const found=data.users.find(x=>x.username===u&&x.status==='Activo');if(found&&(u==='admin'&&p==='admin'||u!=='admin')){currentUser=found;localStorage.setItem('ferreCurrentUser',JSON.stringify(found));localStorage.setItem('ferreLogin','1');showApp()}else alert('Usuario o contraseña incorrectos. Demo: admin / admin')}
+function showApp(){document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.add('active');document.getElementById('currentUserName').textContent=currentUser.name+' · '+currentUser.role;refresh()}
 function logout(){localStorage.removeItem('ferreLogin');location.reload()}
 if(localStorage.getItem('ferreLogin'))showApp();
 
@@ -304,7 +308,7 @@ function finishSale(){
  const total=cart.reduce((a,x)=>a+data.products.find(p=>p.id===x.id).price*x.qty,0),rec=+(document.getElementById('received').value||0);
  if(rec<total)return alert('El pago recibido es menor que el total.');
  const cid=+document.getElementById('saleClient').value,client=data.clients.find(c=>c.id===cid);
- cart.forEach(x=>{const p=data.products.find(p=>p.id===x.id);p.stock-=x.qty;data.movements.push({id:Date.now()+Math.random(),date:new Date().toISOString(),product:p.name,type:'Salida',qty:x.qty,motive:'Venta',user:'admin'})});
+ cart.forEach(x=>{const p=data.products.find(p=>p.id===x.id);p.stock-=x.qty;data.movements.push({id:Date.now()+Math.random(),date:new Date().toISOString(),product:p.name,type:'Salida',qty:x.qty,motive:'Venta',user:currentUser.username})});
  data.sales.push({id:Date.now(),date:new Date().toISOString(),client:client?.name||'Cliente general',payment:document.getElementById('payment').value,total,received:rec,items:cart.map(x=>({...x}))});
  save();cart=[];document.getElementById('received').value='';alert('Venta registrada correctamente. Vuelto: '+money(rec-total));refresh();
 }
@@ -322,6 +326,18 @@ function esc(s){return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').
 function openModal(){document.getElementById('modal').classList.add('show')}
 function closeModal(){document.getElementById('modal').classList.remove('show')}
 document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+
+function renderPurchases(){const e=document.getElementById('purchasesTable');if(!e)return;e.innerHTML=data.purchases.slice().reverse().map(x=>'<tr><td>'+new Date(x.date).toLocaleString()+'</td><td>'+esc(x.supplier)+'</td><td>'+x.items.length+'</td><td>'+money(x.total)+'</td><td><span class="badge ok">Registrada</span></td><td><button class="btn btn-light" onclick="viewPurchase('+x.id+')">Ver</button></td></tr>').join('')||'<tr><td colspan="6" class="empty">No hay compras.</td></tr>'}
+function openPurchase(){document.getElementById('modalTitle').textContent='Nueva compra';document.getElementById('modalBody').innerHTML='<div class="field"><label>Proveedor</label><select id="buySupplier">'+data.suppliers.map(s=>'<option value="'+s.id+'">'+esc(s.name)+'</option>').join('')+'</select></div><div class="field"><label>Producto</label><select id="buyProduct">'+data.products.map(p=>'<option value="'+p.id+'">'+esc(p.name)+'</option>').join('')+'</select></div>'+field('Cantidad','buyQty',1,'number')+field('Costo unitario','buyCost',0,'number')+'<button class="btn btn-primary" onclick="savePurchase()">Registrar compra</button>';openModal()}
+function savePurchase(){const s=data.suppliers.find(x=>x.id===+v('buySupplier')),p=data.products.find(x=>x.id===+v('buyProduct')),q=+v('buyQty'),cost=+v('buyCost');if(!s||!p||q<=0||cost<0)return alert('Completa los datos.');p.stock+=q;data.purchases.push({id:Date.now(),date:new Date().toISOString(),supplier:s.name,total:q*cost,items:[{id:p.id,qty:q,cost:cost}]});data.movements.push({id:Date.now()+1,date:new Date().toISOString(),product:p.name,type:'Entrada',qty:q,motive:'Compra a proveedor',user:currentUser.username});save();closeModal();refresh();alert('Compra registrada y stock actualizado.')}
+function viewPurchase(id){const x=data.purchases.find(a=>a.id===id);document.getElementById('modalTitle').textContent='Detalle de compra';document.getElementById('modalBody').innerHTML='<div class="invoice"><h3>COMPRA</h3><p><b>Proveedor:</b> '+esc(x.supplier)+'</p>'+x.items.map(i=>{const p=data.products.find(a=>a.id===i.id);return '<div class="cart-line"><span>'+esc(p?.name||'Producto')+' × '+i.qty+'</span><b>'+money(i.qty*i.cost)+'</b></div>'}).join('')+'<div class="total"><span>Total</span><span>'+money(x.total)+'</span></div></div>';openModal()}
+function openStockMovement(){document.getElementById('modalTitle').textContent='Entrada de inventario';document.getElementById('modalBody').innerHTML='<div class="field"><label>Producto</label><select id="movProduct">'+data.products.map(p=>'<option value="'+p.id+'">'+esc(p.name)+'</option>').join('')+'</select></div>'+field('Cantidad','movQty',1,'number')+field('Motivo','movReason','Ingreso de mercadería')+'<button class="btn btn-warning" onclick="saveStockMovement()">Registrar</button>';openModal()}
+function saveStockMovement(){const p=data.products.find(x=>x.id===+v('movProduct')),q=+v('movQty');if(!p||q<=0)return alert('Cantidad inválida.');p.stock+=q;data.movements.push({id:Date.now(),date:new Date().toISOString(),product:p.name,type:'Entrada',qty:q,motive:v('movReason'),user:currentUser.username});save();closeModal();refresh();alert('Entrada registrada.')}
+function renderInventory(){const e=document.getElementById('inventoryTable');if(!e)return;document.getElementById('stockInTotal').textContent=data.movements.filter(x=>x.type==='Entrada').reduce((a,x)=>a+x.qty,0);document.getElementById('stockOutTotal').textContent=data.movements.filter(x=>x.type==='Salida').reduce((a,x)=>a+x.qty,0);document.getElementById('movementTotal').textContent=data.movements.length;e.innerHTML=data.movements.slice().reverse().map(m=>'<tr><td>'+new Date(m.date).toLocaleString()+'</td><td>'+esc(m.product)+'</td><td>'+m.type+'</td><td>'+m.qty+'</td><td>'+esc(m.motive)+'</td><td>'+esc(m.user)+'</td></tr>').join('')||'<tr><td colspan="6" class="empty">No hay movimientos.</td></tr>'}
+function renderUsers(){const e=document.getElementById('usersTable');if(!e)return;e.innerHTML=data.users.map(u=>'<tr><td>'+esc(u.username)+'</td><td>'+esc(u.name)+'</td><td><span class="badge">'+esc(u.role)+'</span></td><td>'+esc(u.status)+'</td><td><button class="btn btn-light" onclick="openUser('+u.id+')">Editar</button> <button class="btn btn-danger" onclick="deleteUser('+u.id+')">Eliminar</button></td></tr>').join('')}
+function openUser(id){const u=data.users.find(x=>x.id===id)||{username:'',name:'',role:'Vendedor',status:'Activo'};document.getElementById('modalTitle').textContent=id?'Editar usuario':'Nuevo usuario';document.getElementById('modalBody').innerHTML=field('Usuario','uUser',u.username)+field('Nombre','uName',u.name)+'<div class="field"><label>Rol</label><select id="uRole"><option>Administrador</option><option>Vendedor</option><option>Almacén</option></select></div><div class="field"><label>Estado</label><select id="uStatus"><option>Activo</option><option>Inactivo</option></select></div><button class="btn btn-primary" onclick="saveUser('+(id||0)+')">Guardar</button>';openModal()}
+function saveUser(id){const x={id:id||Date.now(),username:v('uUser'),name:v('uName'),role:document.getElementById('uRole').value,status:document.getElementById('uStatus').value};if(!x.username||!x.name)return alert('Completa usuario y nombre.');if(id)data.users=data.users.map(u=>u.id===id?x:u);else data.users.push(x);save();closeModal();renderUsers()}
+function deleteUser(id){if(id===1)return alert('No se puede eliminar el administrador principal.');if(confirm('¿Eliminar usuario?')){data.users=data.users.filter(u=>u.id!==id);save();renderUsers()}}
 </script>
 </body>
 </html>
