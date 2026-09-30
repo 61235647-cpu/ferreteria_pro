@@ -316,7 +316,7 @@ function renderPeople(id,list,type){
    : type==="employee"
    ? '<td>'+esc(x.doc||"")+'</td><td><b>'+esc(x.name)+'</b></td><td>'+esc(x.role||"")+'</td><td>'+esc(x.phone||"")+'</td><td><span class="badge '+(x.status==="Activo"?"ok":"")+'">'+esc(x.status||"")+'</span></td>'
    : '<td>'+esc(x.doc||"")+'</td><td><b>'+esc(x.name)+'</b></td><td>'+esc(x.contact||"")+'</td><td>'+esc(x.phone||"")+'</td>';
-  return '<tr>'+cells+'<td><button class="btn btn-light" onclick="openPerson(\\''+type+'\\','+x.id+')">Editar</button> <button class="btn btn-danger" onclick="deleteItem(\\''+type+'\\','+x.id+')">Eliminar</button></td></tr>';
+  return '<tr>'+cells+'<td><button class="btn btn-light" onclick="openPerson(\''+type+'\','+x.id+')">Editar</button> <button class="btn btn-danger" onclick="deleteItem(\''+type+'\','+x.id+')">Eliminar</button></td></tr>';
  }).join("");
  const colspan=type==="employee"?6:5;
  e.innerHTML=rows||'<tr><td colspan="'+colspan+'" class="empty">No hay registros.</td></tr>';
