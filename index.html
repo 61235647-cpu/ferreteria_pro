@@ -84,7 +84,7 @@ button{cursor:pointer;border:0}
   <button class="nav-btn" data-page="productos"><span class="ico">📦</span> Productos</button>
   <button class="nav-btn" data-page="clientes"><span class="ico">👥</span> Clientes</button>
   <button class="nav-btn" data-page="empleados"><span class="ico">👤</span> Empleados</button>
-  <button class="nav-btn" data-page="proveedores"><span class="ico">🚚</span> Proveedores</button>
+  <button class="nav-btn" data-page="proveedores"><span class="ico">🚚</span> Proveedores</button>\n  <button class="nav-btn" data-page="compras"><span class="ico">🧾</span> Compras</button>\n  <button class="nav-btn" data-page="inventario"><span class="ico">📋</span> Inventario</button>\n  <button class="nav-btn" data-page="usuarios"><span class="ico">🔐</span> Usuarios y roles</button>
   <div class="menu-title">Sistema</div>
   <button class="nav-btn" data-page="reportes"><span class="ico">📊</span> Reportes</button>
   <button class="nav-btn" data-page="config"><span class="ico">⚙️</span> Configuración</button>
@@ -188,7 +188,7 @@ const seed={
  ],
  sales:[]
 };
-let data=JSON.parse(localStorage.getItem('ferreteriaProData'))||seed;
+let data=JSON.parse(localStorage.getItem('ferreteriaProData'))||seed;\ndata.users=data.users||[{id:1,username:'admin',name:'Administrador',role:'Administrador',status:'Activo'}];\ndata.purchases=data.purchases||[]; data.movements=data.movements||[];
 let cart=[];
 const money=n=>'S/ '+Number(n||0).toFixed(2);
 const save=()=>localStorage.setItem('ferreteriaProData',JSON.stringify(data));
@@ -201,7 +201,7 @@ function showApp(){document.getElementById('login').classList.add('hidden');docu
 function logout(){localStorage.removeItem('ferreLogin');location.reload()}
 if(localStorage.getItem('ferreLogin'))showApp();
 
-const titles={dashboard:'Inicio',productos:'Productos',clientes:'Clientes',empleados:'Empleados',proveedores:'Proveedores',ventas:'Nueva venta',reportes:'Reportes',config:'Configuración'};
+const titles={dashboard:'Inicio',productos:'Productos',clientes:'Clientes',empleados:'Empleados',proveedores:'Proveedores',compras:'Compras',inventario:'Inventario',usuarios:'Usuarios y roles',ventas:'Nueva venta',reportes:'Reportes',config:'Configuración'};
 document.querySelectorAll('.nav-btn[data-page]').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
 function showPage(id){
  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -210,10 +210,10 @@ function showPage(id){
  document.getElementById('pageTitle').textContent=titles[id];
  if(id==='ventas')renderSale();
  if(id==='reportes')renderReports();
- if(id==='dashboard')renderDashboard();
+ if(id==='dashboard')renderDashboard();\n if(id==='compras')renderPurchases();\n if(id==='inventario')renderInventory();\n if(id==='usuarios')renderUsers();
 }
 
-function refresh(){renderDashboard();renderProducts();renderClients();renderEmployees();renderSuppliers();renderSale();renderReports()}
+function refresh(){renderDashboard();renderProducts();renderClients();renderEmployees();renderSuppliers();renderSale();renderReports();renderPurchases();renderInventory();renderUsers()}
 function renderDashboard(){
  document.getElementById('statProducts').textContent=data.products.length;
  document.getElementById('statLow').textContent=data.products.filter(p=>p.stock<=p.min).length;
@@ -304,7 +304,7 @@ function finishSale(){
  const total=cart.reduce((a,x)=>a+data.products.find(p=>p.id===x.id).price*x.qty,0),rec=+(document.getElementById('received').value||0);
  if(rec<total)return alert('El pago recibido es menor que el total.');
  const cid=+document.getElementById('saleClient').value,client=data.clients.find(c=>c.id===cid);
- cart.forEach(x=>{const p=data.products.find(p=>p.id===x.id);p.stock-=x.qty});
+ cart.forEach(x=>{const p=data.products.find(p=>p.id===x.id);p.stock-=x.qty;data.movements.push({id:Date.now()+Math.random(),date:new Date().toISOString(),product:p.name,type:'Salida',qty:x.qty,motive:'Venta',user:'admin'})});
  data.sales.push({id:Date.now(),date:new Date().toISOString(),client:client?.name||'Cliente general',payment:document.getElementById('payment').value,total,received:rec,items:cart.map(x=>({...x}))});
  save();cart=[];document.getElementById('received').value='';alert('Venta registrada correctamente. Vuelto: '+money(rec-total));refresh();
 }
@@ -312,7 +312,7 @@ function renderReports(){
  const total=data.sales.reduce((a,s)=>a+s.total,0);document.getElementById('reportTotal').textContent=money(total);document.getElementById('reportCount').textContent=data.sales.length;
  document.getElementById('salesTable').innerHTML=data.sales.slice().reverse().map(s=>'<tr><td>'+new Date(s.date).toLocaleString()+'</td><td>'+esc(s.client)+'</td><td>'+esc(s.payment)+'</td><td>'+money(s.total)+'</td><td><button class="btn btn-light" onclick="viewSale('+s.id+')">Ver</button></td></tr>').join('')||'<tr><td colspan="5" class="empty">No hay ventas.</td></tr>';
 }
-function viewSale(id){const s=data.sales.find(x=>x.id===id);document.getElementById('modalTitle').textContent='Detalle de venta';document.getElementById('modalBody').innerHTML='<div class="invoice"><h3>FERRETERÍA PRO</h3><p><b>Fecha:</b> '+new Date(s.date).toLocaleString()+'</p><p><b>Cliente:</b> '+esc(s.client)+'</p><hr>'+s.items.map(i=>{const p=data.products.find(x=>x.id===i.id);return '<div class="cart-line"><span>'+esc(p?.name||'Producto')+' × '+i.qty+'</span><b>'+money((p?.price||0)*i.qty)+'</b></div>'}).join('')+'<div class="total"><span>Total</span><span>'+money(s.total)+'</span></div></div>';openModal()}
+function viewSale(id){const s=data.sales.find(x=>x.id===id);document.getElementById('modalTitle').textContent='Detalle de venta';document.getElementById('modalBody').innerHTML='<div class="invoice"><h3>FERRETERÍA PRO</h3><p><b>Fecha:</b> '+new Date(s.date).toLocaleString()+'</p><p><b>Cliente:</b> '+esc(s.client)+'</p><hr>'+s.items.map(i=>{const p=data.products.find(x=>x.id===i.id);return '<div class="cart-line"><span>'+esc(p?.name||'Producto')+' × '+i.qty+'</span><b>'+money((p?.price||0)*i.qty)+'</b></div>'}).join('')+'<div class="total"><span>Total</span><span>'+money(s.total)+'</span></div><button class="btn btn-primary" style="margin-top:15px;width:100%" onclick="printReceipt(data.sales.find(x=>x.id==='+s.id+'))">🖨️ Imprimir boleta / factura</button></div>';openModal()}
 function exportCSV(){let csv='Fecha,Cliente,Método de pago,Total\n'+data.sales.map(s=>[new Date(s.date).toLocaleString(),s.client,s.payment,s.total.toFixed(2)].map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='ventas-ferreteria-pro.csv';a.click()}
 function saveConfig(){alert('Configuración guardada.')}
 function resetData(){if(confirm('Se borrarán los datos actuales y se restaurarán los datos demo.')){data=JSON.parse(JSON.stringify(seed));save();refresh();}}
