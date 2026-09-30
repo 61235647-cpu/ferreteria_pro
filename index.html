@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ferretería Pro</title>
+<style>
+:root{
+  --primary:#1f4e79;--primary2:#163a5c;--accent:#f4b400;--bg:#f3f6f9;
+  --card:#fff;--text:#1d2733;--muted:#718096;--border:#e1e7ee;
+  --success:#1f9d55;--danger:#d64545;--shadow:0 8px 24px rgba(20,45,70,.08)
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0}
+.hidden{display:none!important}
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#163a5c,#2d6da3)}
+.login-card{width:390px;background:#fff;border-radius:18px;padding:36px;box-shadow:0 25px 70px rgba(0,0,0,.2)}
+.logo{display:flex;align-items:center;gap:12px;font-weight:800;font-size:25px;color:var(--primary)}
+.logo-icon{width:48px;height:48px;border-radius:12px;background:var(--accent);display:grid;place-items:center;color:#222;font-size:24px}
+.login-card h1{margin:24px 0 6px}.login-card p{color:var(--muted);margin-top:0}
+.field{margin:14px 0}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+.field input,.field select{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:9px;outline:none;background:#fff}
+.field input:focus,.field select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(31,78,121,.1)}
+.btn{padding:10px 15px;border-radius:9px;font-weight:700}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary2)}
+.btn-warning{background:var(--accent);color:#222}.btn-danger{background:var(--danger);color:#fff}
+.btn-light{background:#eef3f7;color:var(--text)}.btn-success{background:var(--success);color:#fff}
+.app{display:none;min-height:100vh}.app.active{display:flex}
+.sidebar{width:245px;background:#163a5c;color:#fff;min-height:100vh;position:fixed;left:0;top:0;bottom:0;padding:20px 14px;z-index:10}
+.sidebar .brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800;padding:7px 9px 24px}
+.sidebar .brand span{background:var(--accent);color:#222;border-radius:9px;padding:8px}
+.menu-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#a9bfd3;margin:15px 10px 7px}
+.nav-btn{width:100%;display:flex;gap:11px;align-items:center;padding:11px 12px;background:transparent;color:#dce8f2;border-radius:9px;text-align:left;margin:3px 0}
+.nav-btn:hover,.nav-btn.active{background:#28577f;color:#fff}.nav-btn .ico{width:22px;text-align:center}
+.logout{position:absolute;left:14px;right:14px;bottom:20px}
+.main{margin-left:245px;width:calc(100% - 245px);padding:22px 28px}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.topbar h2{margin:0}.user-chip{background:#fff;border:1px solid var(--border);padding:8px 12px;border-radius:20px;font-size:13px}
+.page{display:none}.page.active{display:block}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.stat{background:#fff;border-radius:13px;padding:18px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.stat small{color:var(--muted)}.stat strong{display:block;font-size:27px;margin-top:7px}
+.grid2{display:grid;grid-template-columns:1.3fr .7fr;gap:18px}
+.card{background:#fff;border:1px solid var(--border);border-radius:13px;padding:18px;box-shadow:var(--shadow)}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}.card-head h3{margin:0}
+.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:11px 10px;border-bottom:1px solid var(--border);text-align:left;font-size:13px}.table th{background:#f7f9fb;color:#526477}
+.badge{display:inline-block;padding:4px 8px;border-radius:20px;font-size:11px;font-weight:700;background:#eaf0f5}
+.badge.ok{background:#e4f6eb;color:#19733e}.badge.low{background:#fff0d5;color:#986500}.badge.out{background:#fde7e7;color:#a62929}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:15px}.toolbar input{flex:1;min-width:190px;padding:10px 12px;border:1px solid var(--border);border-radius:9px}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.form-grid.three{grid-template-columns:repeat(3,1fr)}
+.actions{display:flex;gap:6px;flex-wrap:wrap}.empty{padding:35px;text-align:center;color:var(--muted)}
+.sale-layout{display:grid;grid-template-columns:1.5fr .8fr;gap:18px}.products-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-height:520px;overflow:auto}
+.product-card{border:1px solid var(--border);border-radius:11px;padding:13px;background:#fff}.product-card h4{margin:0 0 7px}.product-card p{margin:4px 0;color:var(--muted);font-size:12px}.product-card strong{font-size:17px}.cart-line{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.total{font-size:21px;font-weight:800;display:flex;justify-content:space-between;margin-top:15px}.modal{position:fixed;inset:0;background:rgba(10,25,40,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}.modal.show{display:flex}.modal-box{background:#fff;border-radius:15px;width:min(650px,100%);padding:22px;max-height:90vh;overflow:auto}.modal-head{display:flex;justify-content:space-between;align-items:center}.modal-head h3{margin:0}.close{background:#eef3f7;border-radius:50%;width:32px;height:32px}
+.invoice{border:1px dashed #b9c5d0;padding:20px;background:#fff;margin-top:15px}.invoice h3{text-align:center;margin:0 0 12px}
+.notice{padding:10px 12px;border-radius:8px;background:#edf5ff;color:#24567e;font-size:13px;margin-bottom:15px}
+.config-row{display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:1px solid var(--border)}
+@media(max-width:1000px){.sidebar{width:205px}.main{margin-left:205px;width:calc(100% - 205px)}.cards{grid-template-columns:repeat(2,1fr)}.sale-layout,.grid2{grid-template-columns:1fr}.products-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.sidebar{position:relative;width:100%;min-height:auto}.main{margin-left:0;width:100%}.app.active{display:block}.sidebar .logout{position:static;margin-top:10px}.form-grid,.form-grid.three{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.products-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<section id="login" class="login">
+  <div class="login-card">
+    <div class="logo"><div class="logo-icon">🔨</div> Ferretería Pro</div>
+    <h1>Iniciar sesión</h1>
+    <p>Accede al sistema de gestión de tu ferretería.</p>
+    <div class="field"><label>Usuario</label><input id="loginUser" value="admin"></div>
+    <div class="field"><label>Contraseña</label><input id="loginPass" type="password" value="admin"></div>
+    <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="login()">Ingresar</button>
+    <p style="font-size:12px;margin-top:15px">Demo: admin / admin</p>
+  </div>
+</section>
+
+<div id="app" class="app">
+<aside class="sidebar">
+  <div class="brand"><span>🔨</span> Ferretería Pro</div>
+  <div class="menu-title">Principal</div>
+  <button class="nav-btn active" data-page="dashboard"><span class="ico">🏠</span> Inicio</button>
+  <button class="nav-btn" data-page="ventas"><span class="ico">🛒</span> Nueva venta</button>
+  <div class="menu-title">Gestión</div>
+  <button class="nav-btn" data-page="productos"><span class="ico">📦</span> Productos</button>
+  <button class="nav-btn" data-page="clientes"><span class="ico">👥</span> Clientes</button>
+  <button class="nav-btn" data-page="empleados"><span class="ico">👤</span> Empleados</button>
+  <button class="nav-btn" data-page="proveedores"><span class="ico">🚚</span> Proveedores</button>
+  <div class="menu-title">Sistema</div>
+  <button class="nav-btn" data-page="reportes"><span class="ico">📊</span> Reportes</button>
+  <button class="nav-btn" data-page="config"><span class="ico">⚙️</span> Configuración</button>
+  <button class="nav-btn logout" onclick="logout()"><span class="ico">↪</span> Cerrar sesión</button>
+</aside>
+
+<main class="main">
+  <div class="topbar"><h2 id="pageTitle">Inicio</h2><div class="user-chip">👤 Administrador</div></div>
+
+  <section id="dashboard" class="page active">
+    <div class="cards">
+      <div class="stat"><small>Productos</small><strong id="statProducts">0</strong></div>
+      <div class="stat"><small>Stock bajo</small><strong id="statLow">0</strong></div>
+      <div class="stat"><small>Clientes</small><strong id="statClients">0</strong></div>
+      <div class="stat"><small>Ventas registradas</small><strong id="statSales">0</strong></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><div class="card-head"><h3>Ventas recientes</h3><button class="btn btn-light" onclick="showPage('ventas')">Nueva venta</button></div><div id="recentSales"></div></div>
+      <div class="card"><div class="card-head"><h3>Stock bajo</h3></div><div id="lowStock"></div></div>
+    </div>
+  </section>
+
+  <section id="productos" class="page">
+    <div class="card">
+      <div class="card-head"><h3>Productos</h3><button class="btn btn-primary" onclick="openProduct()">+ Nuevo producto</button></div>
+      <div class="toolbar"><input id="productSearch" placeholder="Buscar por código o nombre..." oninput="renderProducts()"></div>
+      <div class="table-wrap"><table class="table"><thead><tr><th>Código</th><th>Producto</th><th>Unidad</th><th>Stock</th><th>Mínimo</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="productsTable"></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="clientes" class="page">
+    <div class="card"><div class="card-head"><h3>Clientes</h3><button class="btn btn-primary" onclick="openPerson('client')">+ Nuevo cliente</button></div>
+    <div class="toolbar"><input id="clientSearch" placeholder="Buscar cliente..." oninput="renderClients()"></div>
+    <div class="table-wrap"><table class="table"><thead><tr><th>Documento</th><th>Nombre</th><th>Teléfono</th><th>Dirección</th><th>Acciones</th></tr></thead><tbody id="clientsTable"></tbody></table></div></div>
+  </section>
+
+  <section id="empleados" class="page">
+    <div class="card"><div class="card-head"><h3>Empleados</h3><button class="btn btn-primary" onclick="openPerson('employee')">+ Nuevo empleado</button></div>
+    <div class="table-wrap"><table class="table"><thead><tr><th>DNI</th><th>Nombre</th><th>Cargo</th><th>Teléfono</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="employeesTable"></tbody></table></div></div>
+  </section>
+
+  <section id="proveedores" class="page">
+    <div class="card"><div class="card-head"><h3>Proveedores</h3><button class="btn btn-primary" onclick="openPerson('supplier')">+ Nuevo proveedor</button></div>
+    <div class="table-wrap"><table class="table"><thead><tr><th>RUC</th><th>Empresa</th><th>Contacto</th><th>Teléfono</th><th>Acciones</th></tr></thead><tbody id="suppliersTable"></tbody></table></div></div>
+  </section>
+
+  <section id="ventas" class="page">
+    <div class="sale-layout">
+      <div class="card"><div class="card-head"><h3>Seleccionar productos</h3><select id="saleClient" style="padding:9px;border:1px solid var(--border);border-radius:8px"></select></div>
+        <div class="toolbar"><input id="saleSearch" placeholder="Buscar producto..." oninput="renderSaleProducts()"></div><div id="saleProducts" class="products-grid"></div>
+      </div>
+      <div class="card"><div class="card-head"><h3>Carrito</h3><button class="btn btn-light" onclick="clearCart()">Vaciar</button></div><div id="cart"></div>
+        <div class="field"><label>Método de pago</label><select id="payment"><option>Efectivo</option><option>Yape / Plin</option><option>Tarjeta</option><option>Transferencia</option></select></div>
+        <div class="field"><label>Pago recibido</label><input id="received" type="number" min="0" step=".01" oninput="updateChange()" placeholder="0.00"></div>
+        <div class="total"><span>Total</span><span id="cartTotal">S/ 0.00</span></div>
+        <div class="total" style="font-size:15px"><span>Vuelto</span><span id="change">S/ 0.00</span></div>
+        <button class="btn btn-success" style="width:100%;margin-top:15px" onclick="finishSale()">Registrar venta</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="reportes" class="page">
+    <div class="cards"><div class="stat"><small>Total vendido</small><strong id="reportTotal">S/ 0.00</strong></div><div class="stat"><small>Número de ventas</small><strong id="reportCount">0</strong></div></div>
+    <div class="card"><div class="card-head"><h3>Historial de ventas</h3><button class="btn btn-light" onclick="exportCSV()">Exportar CSV</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Fecha</th><th>Cliente</th><th>Pago</th><th>Total</th><th>Acciones</th></tr></thead><tbody id="salesTable"></tbody></table></div></div>
+  </section>
+
+  <section id="config" class="page">
+    <div class="card"><div class="card-head"><h3>Configuración</h3></div>
+      <div class="config-row"><div><b>Nombre del negocio</b><div style="color:var(--muted);font-size:13px">Nombre mostrado en el sistema</div></div><input id="businessName" value="Ferretería Pro" style="padding:9px;border:1px solid var(--border);border-radius:8px"></div>
+      <div class="config-row"><div><b>Moneda</b><div style="color:var(--muted);font-size:13px">Moneda utilizada para las ventas</div></div><select style="padding:9px;border:1px solid var(--border);border-radius:8px"><option>Soles (S/)</option></select></div>
+      <div class="config-row"><div><b>IGV</b><div style="color:var(--muted);font-size:13px">Impuesto aplicado</div></div><b>18%</b></div>
+      <div style="margin-top:18px"><button class="btn btn-primary" onclick="saveConfig()">Guardar configuración</button><button class="btn btn-danger" style="margin-left:8px" onclick="resetData()">Restablecer datos demo</button></div>
+    </div>
+  </section>
+</main>
+</div>
+
+<div id="modal" class="modal"><div class="modal-box"><div class="modal-head"><h3 id="modalTitle"></h3><button class="close" onclick="closeModal()">×</button></div><div id="modalBody"></div></div></div>
+
+<script>
+const seed={
+ products:[
+  {id:1,sku:'FER-001',name:'Martillo de acero 16 oz',unit:'Unidad',stock:18,min:5,price:35},
+  {id:2,sku:'FER-002',name:'Taladro eléctrico 650W',unit:'Unidad',stock:7,min:3,price:189.9},
+  {id:3,sku:'FER-003',name:'Cemento 42.5 kg',unit:'Bolsa',stock:42,min:10,price:31.5},
+  {id:4,sku:'FER-004',name:'Tubo PVC 1/2"',unit:'Unidad',stock:6,min:8,price:8.5},
+  {id:5,sku:'FER-005',name:'Pintura látex blanca 1 galón',unit:'Galón',stock:12,min:4,price:48},
+  {id:6,sku:'FER-006',name:'Juego de llaves 8 piezas',unit:'Juego',stock:9,min:3,price:55}
+ ],
+ clients:[
+  {id:1,doc:'70881234',name:'Juan Pérez',phone:'987654321',address:'Lima'},
+  {id:2,doc:'10456789',name:'María Torres',phone:'956123789',address:'San Miguel'}
+ ],
+ employees:[
+  {id:1,doc:'71234567',name:'Carlos Mendoza',role:'Vendedor',phone:'999111222',status:'Activo'},
+  {id:2,doc:'72345678',name:'Ana López',role:'Administrador',phone:'988222333',status:'Activo'}
+ ],
+ suppliers:[
+  {id:1,doc:'20123456789',name:'Distribuidora Andina SAC',contact:'Luis Ramos',phone:'945555111'},
+  {id:2,doc:'20456789123',name:'Materiales del Sur EIRL',contact:'Rosa Díaz',phone:'933444222'}
+ ],
+ sales:[]
+};
+let data=JSON.parse(localStorage.getItem('ferreteriaProData'))||seed;
+let cart=[];
+const money=n=>'S/ '+Number(n||0).toFixed(2);
+const save=()=>localStorage.setItem('ferreteriaProData',JSON.stringify(data));
+
+function login(){
+ const u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value;
+ if(u==='admin'&&p==='admin'){localStorage.setItem('ferreLogin','1');showApp()}else alert('Usuario o contraseña incorrectos. Demo: admin / admin');
+}
+function showApp(){document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.add('active');refresh()}
+function logout(){localStorage.removeItem('ferreLogin');location.reload()}
+if(localStorage.getItem('ferreLogin'))showApp();
+
+const titles={dashboard:'Inicio',productos:'Productos',clientes:'Clientes',empleados:'Empleados',proveedores:'Proveedores',ventas:'Nueva venta',reportes:'Reportes',config:'Configuración'};
+document.querySelectorAll('.nav-btn[data-page]').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+function showPage(id){
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+ document.querySelectorAll('.nav-btn[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+ document.getElementById('pageTitle').textContent=titles[id];
+ if(id==='ventas')renderSale();
+ if(id==='reportes')renderReports();
+ if(id==='dashboard')renderDashboard();
+}
+
+function refresh(){renderDashboard();renderProducts();renderClients();renderEmployees();renderSuppliers();renderSale();renderReports()}
+function renderDashboard(){
+ document.getElementById('statProducts').textContent=data.products.length;
+ document.getElementById('statLow').textContent=data.products.filter(p=>p.stock<=p.min).length;
+ document.getElementById('statClients').textContent=data.clients.length;
+ document.getElementById('statSales').textContent=data.sales.length;
+ const recent=data.sales.slice(-5).reverse();
+ document.getElementById('recentSales').innerHTML=recent.length?'<div class="table-wrap"><table class="table"><tr><th>Fecha</th><th>Cliente</th><th>Total</th></tr>'+recent.map(s=>'<tr><td>'+new Date(s.date).toLocaleDateString()+'</td><td>'+esc(s.client)+'</td><td>'+money(s.total)+'</td></tr>').join('')+'</table></div>':'<div class="empty">Aún no hay ventas registradas.</div>';
+ const low=data.products.filter(p=>p.stock<=p.min);
+ document.getElementById('lowStock').innerHTML=low.length?low.map(p=>'<div class="cart-line"><span>'+esc(p.name)+'</span><b>'+p.stock+' / mín. '+p.min+'</b></div>').join(''):'<div class="empty">Todo el stock está en niveles normales.</div>';
+}
+function renderProducts(){
+ const q=(document.getElementById('productSearch')?.value||'').toLowerCase();
+ const rows=data.products.filter(p=>(p.name+' '+p.sku).toLowerCase().includes(q));
+ document.getElementById('productsTable').innerHTML=rows.length?rows.map(p=>{
+  const cls=p.stock===0?'out':p.stock<=p.min?'low':'ok',txt=p.stock===0?'Sin stock':p.stock<=p.min?'Stock bajo':'Disponible';
+  return '<tr><td>'+esc(p.sku)+'</td><td><b>'+esc(p.name)+'</b></td><td>'+esc(p.unit)+'</td><td>'+p.stock+'</td><td>'+p.min+'</td><td>'+money(p.price)+'</td><td><span class="badge '+cls+'">'+txt+'</span></td><td><div class="actions"><button class="btn btn-light" onclick="openProduct('+p.id+')">Editar</button><button class="btn btn-danger" onclick="deleteItem(\'products\','+p.id+')">Eliminar</button></div></td></tr>'
+ }).join(''):'<tr><td colspan="8" class="empty">No hay productos.</td></tr>';
+}
+function openProduct(id){
+ const p=data.products.find(x=>x.id===id)||{sku:'',name:'',unit:'Unidad',stock:0,min:0,price:0};
+ document.getElementById('modalTitle').textContent=id?'Editar producto':'Nuevo producto';
+ document.getElementById('modalBody').innerHTML='<div class="form-grid">'+
+ field('Código / SKU','pSku',p.sku)+field('Nombre','pName',p.name)+field('Unidad','pUnit',p.unit)+field('Stock','pStock',p.stock,'number')+
+ field('Stock mínimo','pMin',p.min,'number')+field('Precio','pPrice',p.price,'number')+'</div><div style="margin-top:16px"><button class="btn btn-primary" onclick="saveProduct('+ (id||0) +')">Guardar</button></div>';
+ openModal();
+}
+function saveProduct(id){
+ const p={id:id||Date.now(),sku:v('pSku'),name:v('pName'),unit:v('pUnit'),stock:+v('pStock'),min:+v('pMin'),price:+v('pPrice')};
+ if(!p.sku||!p.name)return alert('Completa código y nombre.');
+ if(id)data.products=data.products.map(x=>x.id===id?p:x);else data.products.push(p);
+ save();closeModal();refresh();
+}
+
+function renderClients(){
+ const q=(document.getElementById('clientSearch')?.value||'').toLowerCase();
+ const rows=data.clients.filter(x=>(x.doc+' '+x.name).toLowerCase().includes(q));
+ document.getElementById('clientsTable').innerHTML=rows.length?rows.map(x=>'<tr><td>'+esc(x.doc)+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.phone)+'</td><td>'+esc(x.address)+'</td><td><button class="btn btn-light" onclick="openPerson(\'client\','+x.id+')">Editar</button> <button class="btn btn-danger" onclick="deleteItem(\'clients\','+x.id+')">Eliminar</button></td></tr>').join(''):'<tr><td colspan="5" class="empty">No hay clientes.</td></tr>';
+}
+function renderEmployees(){
+ document.getElementById('employeesTable').innerHTML=data.employees.map(x=>'<tr><td>'+esc(x.doc)+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.role)+'</td><td>'+esc(x.phone)+'</td><td><span class="badge ok">'+esc(x.status)+'</span></td><td><button class="btn btn-light" onclick="openPerson(\'employee\','+x.id+')">Editar</button> <button class="btn btn-danger" onclick="deleteItem(\'employees\','+x.id+')">Eliminar</button></td></tr>').join('')||'<tr><td colspan="6" class="empty">No hay empleados.</td></tr>';
+}
+function renderSuppliers(){
+ document.getElementById('suppliersTable').innerHTML=data.suppliers.map(x=>'<tr><td>'+esc(x.doc)+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.contact)+'</td><td>'+esc(x.phone)+'</td><td><button class="btn btn-light" onclick="openPerson(\'supplier\','+x.id+')">Editar</button> <button class="btn btn-danger" onclick="deleteItem(\'suppliers\','+x.id+')">Eliminar</button></td></tr>').join('')||'<tr><td colspan="5" class="empty">No hay proveedores.</td></tr>';
+}
+function openPerson(type,id){
+ const map={client:['Cliente','clients',['Documento','Nombre','Teléfono','Dirección']],employee:['Empleado','employees',['DNI','Nombre','Cargo','Teléfono']],supplier:['Proveedor','suppliers',['RUC','Empresa','Contacto','Teléfono']]};
+ const m=map[type], arr=data[m[1]], x=arr.find(a=>a.id===id)||{};
+ const vals=[x.doc||'',x.name||'',x.phone||'',type==='client'?(x.address||''):type==='employee'?(x.role||''):(x.contact||'')];
+ document.getElementById('modalTitle').textContent=(id?'Editar ':'Nuevo ')+m[0];
+ document.getElementById('modalBody').innerHTML='<div class="form-grid">'+field(m[2][0],'f1',vals[0])+field(m[2][1],'f2',vals[1])+field(m[2][2], 'f3',vals[2])+field(m[2][3],'f4',vals[3])+'</div><div style="margin-top:16px"><button class="btn btn-primary" onclick="savePerson(\''+type+'\','+(id||0)+')">Guardar</button></div>';
+ openModal();
+}
+function savePerson(type,id){
+ const key={client:'clients',employee:'employees',supplier:'suppliers'}[type], x={id:id||Date.now(),doc:v('f1'),name:v('f2'),phone:v('f3')};
+ if(type==='client')x.address=v('f4');if(type==='employee'){x.role=v('f4');x.status='Activo'}if(type==='supplier')x.contact=v('f4');
+ if(!x.doc||!x.name)return alert('Completa los campos principales.');
+ if(id)data[key]=data[key].map(a=>a.id===id?x:a);else data[key].push(x);
+ save();closeModal();refresh();
+}
+function deleteItem(key,id){if(confirm('¿Eliminar este registro?')){data[key]=data[key].filter(x=>x.id!==id);save();refresh()}}
+
+function renderSale(){
+ const s=document.getElementById('saleClient');if(!s)return;
+ s.innerHTML='<option value="">Cliente general</option>'+data.clients.map(c=>'<option value="'+c.id+'">'+esc(c.name)+' - '+esc(c.doc)+'</option>').join('');
+ renderSaleProducts();renderCart();
+}
+function renderSaleProducts(){
+ const q=(document.getElementById('saleSearch')?.value||'').toLowerCase();
+ const rows=data.products.filter(p=>p.stock>0&&(p.name+' '+p.sku).toLowerCase().includes(q));
+ document.getElementById('saleProducts').innerHTML=rows.map(p=>'<div class="product-card"><h4>'+esc(p.name)+'</h4><p>'+esc(p.sku)+' · '+esc(p.unit)+'</p><p>Stock: '+p.stock+'</p><strong>'+money(p.price)+'</strong><br><button class="btn btn-primary" style="margin-top:9px;width:100%" onclick="addCart('+p.id+')">Agregar</button></div>').join('')||'<div class="empty">No hay productos disponibles.</div>';
+}
+function addCart(id){
+ const p=data.products.find(x=>x.id===id), line=cart.find(x=>x.id===id);
+ if(line){if(line.qty<p.stock)line.qty++;else alert('No hay más stock disponible.')}else cart.push({id,qty:1});
+ renderCart();
+}
+function renderCart(){
+ const el=document.getElementById('cart');if(!el)return;
+ el.innerHTML=cart.length?cart.map(x=>{const p=data.products.find(a=>a.id===x.id);return '<div class="cart-line"><span>'+esc(p.name)+'<br><small>'+x.qty+' × '+money(p.price)+'</small></span><span><b>'+money(p.price*x.qty)+'</b><br><button onclick="changeQty('+x.id+',-1)">−</button> <button onclick="changeQty('+x.id+',1)">+</button></span></div>'}).join(''):'<div class="empty">Agrega productos al carrito.</div>';
+ const total=cart.reduce((a,x)=>a+(data.products.find(p=>p.id===x.id).price*x.qty),0);
+ document.getElementById('cartTotal').textContent=money(total);updateChange();
+}
+function changeQty(id,n){const l=cart.find(x=>x.id===id),p=data.products.find(x=>x.id===id);if(!l)return;l.qty+=n;if(l.qty>p.stock)l.qty=p.stock;if(l.qty<=0)cart=cart.filter(x=>x.id!==id);renderCart()}
+function clearCart(){cart=[];renderCart()}
+function updateChange(){const total=cart.reduce((a,x)=>a+data.products.find(p=>p.id===x.id).price*x.qty,0);const rec=+(document.getElementById('received')?.value||0);document.getElementById('change').textContent=money(Math.max(0,rec-total))}
+function finishSale(){
+ if(!cart.length)return alert('Agrega al menos un producto.');
+ const total=cart.reduce((a,x)=>a+data.products.find(p=>p.id===x.id).price*x.qty,0),rec=+(document.getElementById('received').value||0);
+ if(rec<total)return alert('El pago recibido es menor que el total.');
+ const cid=+document.getElementById('saleClient').value,client=data.clients.find(c=>c.id===cid);
+ cart.forEach(x=>{const p=data.products.find(p=>p.id===x.id);p.stock-=x.qty});
+ data.sales.push({id:Date.now(),date:new Date().toISOString(),client:client?.name||'Cliente general',payment:document.getElementById('payment').value,total,received:rec,items:cart.map(x=>({...x}))});
+ save();cart=[];document.getElementById('received').value='';alert('Venta registrada correctamente. Vuelto: '+money(rec-total));refresh();
+}
+function renderReports(){
+ const total=data.sales.reduce((a,s)=>a+s.total,0);document.getElementById('reportTotal').textContent=money(total);document.getElementById('reportCount').textContent=data.sales.length;
+ document.getElementById('salesTable').innerHTML=data.sales.slice().reverse().map(s=>'<tr><td>'+new Date(s.date).toLocaleString()+'</td><td>'+esc(s.client)+'</td><td>'+esc(s.payment)+'</td><td>'+money(s.total)+'</td><td><button class="btn btn-light" onclick="viewSale('+s.id+')">Ver</button></td></tr>').join('')||'<tr><td colspan="5" class="empty">No hay ventas.</td></tr>';
+}
+function viewSale(id){const s=data.sales.find(x=>x.id===id);document.getElementById('modalTitle').textContent='Detalle de venta';document.getElementById('modalBody').innerHTML='<div class="invoice"><h3>FERRETERÍA PRO</h3><p><b>Fecha:</b> '+new Date(s.date).toLocaleString()+'</p><p><b>Cliente:</b> '+esc(s.client)+'</p><hr>'+s.items.map(i=>{const p=data.products.find(x=>x.id===i.id);return '<div class="cart-line"><span>'+esc(p?.name||'Producto')+' × '+i.qty+'</span><b>'+money((p?.price||0)*i.qty)+'</b></div>'}).join('')+'<div class="total"><span>Total</span><span>'+money(s.total)+'</span></div></div>';openModal()}
+function exportCSV(){let csv='Fecha,Cliente,Método de pago,Total\n'+data.sales.map(s=>[new Date(s.date).toLocaleString(),s.client,s.payment,s.total.toFixed(2)].map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='ventas-ferreteria-pro.csv';a.click()}
+function saveConfig(){alert('Configuración guardada.')}
+function resetData(){if(confirm('Se borrarán los datos actuales y se restaurarán los datos demo.')){data=JSON.parse(JSON.stringify(seed));save();refresh();}}
+function field(label,id,value,type='text'){return '<div class="field"><label>'+label+'</label><input id="'+id+'" type="'+type+'" value="'+esc(String(value??''))+'"></div>'}
+function v(id){return document.getElementById(id).value.trim()}
+function esc(s){return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}
+function openModal(){document.getElementById('modal').classList.add('show')}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+</script>
+</body>
+</html>
