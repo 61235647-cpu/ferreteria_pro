@@ -141,7 +141,8 @@ html,body{background:var(--bg);color:var(--ink)}
   <button class="nav-btn" data-page="inventario"><span class="ico">ST</span> Inventario</button>
   <button class="nav-btn" data-page="usuarios"><span class="ico">US</span> Usuarios y roles</button>
   <div class="menu-title">Sistema</div>
-  <button class="nav-btn" data-page="documentos"><span class="ico">DC</span> Comprobantes</button>\n  <button class="nav-btn" data-page="reportes"><span class="ico">RP</span> Reportes</button>
+  <button class="nav-btn" data-page="documentos"><span class="ico">DC</span> Comprobantes</button>
+  <button class="nav-btn" data-page="reportes"><span class="ico">RP</span> Reportes</button>
   <button class="nav-btn" data-page="config"><span class="ico">CF</span> Configuración</button>
   <button class="nav-btn logout" onclick="logout()"><span class="ico">SAL</span> Cerrar sesión</button>
 </aside>
@@ -255,7 +256,7 @@ function login(){
  if(found&&p==="admin"){currentUser=found;localStorage.setItem("ferreCurrentUser",JSON.stringify(found));localStorage.setItem("ferreLogin","1");showApp();return}
  alert("Usuario o contraseña incorrectos. Demo: admin / admin");
 }
-function showApp(){document.getElementById("login").classList.add("hidden");document.getElementById("app").classList.add("active");document.getElementById("currentUserName").textContent=currentUser.name+" · "+currentUser.role;refresh()}
+function showApp(){document.getElementById("app").classList.add("active");document.getElementById("currentUserName").textContent=currentUser.name+" · "+currentUser.role;refresh()}
 function logout(){localStorage.removeItem("ferreLogin");localStorage.removeItem("ferreCurrentUser");location.reload()}
 function showPage(id){
  document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(id)?.classList.add("active");
@@ -266,10 +267,15 @@ function showPage(id){
 }
 function refresh(){renderDashboard();renderProducts();renderClients();renderSaleProducts();renderPurchases();renderInventory();renderUsers();renderEmployees();renderSuppliers();renderReports();renderDocuments()}
 function renderDashboard(){
+ const low=data.products.filter(x=>x.stock<=x.min), total=data.sales.reduce((a,x)=>a+Number(x.total||0),0);
  const p=document.getElementById("statProducts");if(p)p.textContent=data.products.length;
- const l=document.getElementById("statLow");if(l)l.textContent=data.products.filter(x=>x.stock<=x.min).length;
+ const l=document.getElementById("statLow");if(l)l.textContent=low.length;
  const c=document.getElementById("statClients");if(c)c.textContent=data.clients.length;
  const s=document.getElementById("statSales");if(s)s.textContent=data.sales.length;
+ const recent=document.getElementById("recentSales");
+ if(recent)recent.innerHTML=data.sales.slice().sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5).map(x=>'<div class="dash-row"><span><b>'+esc(x.client)+'</b><small>'+esc(x.documentNumber||"Venta")+' · '+new Date(x.date).toLocaleDateString()+'</small></span><strong>'+money(x.total)+'</strong></div>').join("")||'<div class="empty">Aún no hay ventas registradas.</div>';
+ const lowBox=document.getElementById("lowStock");
+ if(lowBox)lowBox.innerHTML=low.slice(0,6).map(x=>'<div class="dash-row"><span><b>'+esc(x.name)+'</b><small>'+esc(x.sku)+' · mínimo '+x.min+'</small></span><span class="badge '+(x.stock===0?"out":"low")+'">'+x.stock+' '+esc(x.unit)+'</span></div>').join("")||'<div class="empty">Todo el stock está en niveles normales.</div>';
 }
 function renderProducts(){
  const e=document.getElementById("productsTable");if(!e)return;const q=v("productSearch").toLowerCase();
@@ -281,16 +287,27 @@ function openProduct(id){
  document.getElementById("modalBody").innerHTML='<div class="form-grid">'+field("SKU","pSku",p.sku)+field("Nombre","pName",p.name)+field("Unidad","pUnit",p.unit)+field("Stock","pStock",p.stock,"number")+field("Stock mínimo","pMin",p.min,"number")+field("Precio","pPrice",p.price,"number")+'</div><button class="btn btn-primary" onclick="saveProduct('+(id||0)+')">Guardar producto</button>';openModal();
 }
 function saveProduct(id){
- const x={id:id||Date.now(),sku:v("pSku"),name:v("pName"),unit:v("pUnit"),stock:+v("pStock"),min:+v("pMin"),price:+v("pPrice")};
- if(!x.sku||!x.name)return alert("Completa los datos.");if(id)data.products=data.products.map(p=>p.id===id?x:p);else data.products.push(x);save();closeModal();refresh();
+ const x={id:id||Date.now(),sku:v("pSku").trim(),name:v("pName").trim(),unit:v("pUnit").trim()||"Unidad",stock:+v("pStock"),min:+v("pMin"),price:+v("pPrice")};
+ if(!x.sku||!x.name)return alert("Completa código y nombre.");
+ if([x.stock,x.min,x.price].some(n=>!Number.isFinite(n)||n<0))return alert("Stock, mínimo y precio deben ser valores válidos.");
+ const duplicate=data.products.some(p=>p.sku.toLowerCase()===x.sku.toLowerCase()&&p.id!==x.id);if(duplicate)return alert("El código SKU ya existe.");
+ if(id)data.products=data.products.map(p=>p.id===id?x:p);else data.products.push(x);save();closeModal();refresh();
 }
 function renderClients(){renderPeople("clientsTable",data.clients,"client")}
 function renderEmployees(){renderPeople("employeesTable",data.employees,"employee")}
 function renderSuppliers(){renderPeople("suppliersTable",data.suppliers,"supplier")}
 function renderPeople(id,list,type){
- const searchId=type==="client"?"clientSearch":null,q=searchId?v(searchId).trim().toLowerCase():"";const e=document.getElementById(id);if(!e)return;
- const rows=list.filter(x=>(x.name+" "+(x.doc||"")+" "+(x.phone||"")+" "+(x.address||"")).toLowerCase().includes(q)).map(x=>'<tr><td>'+esc(x.doc||"")+'</td><td><b>'+esc(x.name)+'</b></td><td>'+esc(x.phone||x.contact||"")+'</td><td><button class="btn btn-light" onclick="openPerson(\''+type+'\','+x.id+')">Editar</button> <button class="btn btn-danger" onclick="deleteItem(\''+type+'\','+x.id+')">Eliminar</button></td></tr>').join("");
- e.innerHTML=rows||'<tr><td colspan="6" class="empty">No hay registros.</td></tr>';
+ const searchId=type==="client"?"clientSearch":null,q=searchId?v(searchId).trim().toLowerCase():"",e=document.getElementById(id);if(!e)return;
+ const rows=list.filter(x=>(x.name+" "+(x.doc||"")+" "+(x.phone||"")+" "+(x.address||"")+" "+(x.contact||"")+" "+(x.role||"")).toLowerCase().includes(q)).map(x=>{
+  let cells=type==="client"
+   ? '<td>'+esc(x.doc||"")+'</td><td><b>'+esc(x.name)+'</b></td><td>'+esc(x.phone||"")+'</td><td>'+esc(x.address||"")+'</td>'
+   : type==="employee"
+   ? '<td>'+esc(x.doc||"")+'</td><td><b>'+esc(x.name)+'</b></td><td>'+esc(x.role||"")+'</td><td>'+esc(x.phone||"")+'</td><td><span class="badge '+(x.status==="Activo"?"ok":"")+'">'+esc(x.status||"")+'</span></td>'
+   : '<td>'+esc(x.doc||"")+'</td><td><b>'+esc(x.name)+'</b></td><td>'+esc(x.contact||"")+'</td><td>'+esc(x.phone||"")+'</td>';
+  return '<tr>'+cells+'<td><button class="btn btn-light" onclick="openPerson(\\''+type+'\\','+x.id+')">Editar</button> <button class="btn btn-danger" onclick="deleteItem(\\''+type+'\\','+x.id+')">Eliminar</button></td></tr>';
+ }).join("");
+ const colspan=type==="employee"?6:5;
+ e.innerHTML=rows||'<tr><td colspan="'+colspan+'" class="empty">No hay registros.</td></tr>';
 }
 function openPerson(type,id){
  const map={client:["Cliente",data.clients],employee:["Empleado",data.employees],supplier:["Proveedor",data.suppliers]},m=map[type],x=m[1].find(a=>a.id===id)||{doc:"",name:"",phone:"",address:"",role:"Vendedor",status:"Activo",contact:""};
@@ -313,7 +330,7 @@ function renderSaleProducts(){
    clients.innerHTML='<option value="0">Cliente general</option>'+data.clients.map(x=>'<option value="'+x.id+'">'+esc(x.name)+'</option>').join("");
  }
  e.innerHTML=list.map(p=>'<div class="product-card"><h4>'+esc(p.name)+'</h4><p>'+esc(p.sku)+' · Stock: '+p.stock+' · '+esc(p.unit)+'</p><strong>'+money(p.price)+'</strong><br><button class="btn btn-primary" style="margin-top:10px;width:100%" onclick="addCart('+p.id+')">Agregar</button></div>').join("")||'<div class="empty">No se encontraron productos con esa búsqueda.</div>';
- renderCart();renderDocumentFields();
+ renderCart();
 }
 function addCart(id){const p=data.products.find(x=>x.id===id);if(!p||p.stock<=0)return alert("Producto sin stock.");const x=cart.find(a=>a.id===id);if(x){if(x.qty<p.stock)x.qty++;else return alert("Stock insuficiente")}else cart.push({id,qty:1});renderCart()}
 function changeQty(id,d){const x=cart.find(a=>a.id===id),p=data.products.find(a=>a.id===id);if(!x)return;x.qty+=d;if(x.qty<=0)cart=cart.filter(a=>a.id!==id);else if(x.qty>p.stock)x.qty=p.stock;renderCart()}
@@ -323,7 +340,14 @@ function renderCart(){
  const total=cart.reduce((a,x)=>a+(data.products.find(p=>p.id===x.id).price*x.qty),0),t=document.getElementById("cartTotal");if(t)t.textContent=money(total);updateChange();
 }
 function updateChange(){const total=cart.reduce((a,x)=>a+(data.products.find(p=>p.id===x.id)?.price||0)*x.qty,0),rec=+(v("received")||0),e=document.getElementById("change");if(e)e.textContent=money(Math.max(0,rec-total))}
-function renderDocumentFields(){const e=document.getElementById("documentCustomerFields");if(!e)return;const type=v("documentType")||"BOLETA";e.innerHTML='<div class="form-grid"><div class="field"><label>Documento del cliente</label><div style="display:flex;gap:8px"><input id="customerDoc" placeholder="'+(type==="FACTURA"?"RUC":"DNI / RUC")+'"><button class="btn btn-light" type="button" onclick="consultarDNIVenta()">Consultar DNI</button></div><span id="saleDniStatus" style="color:var(--muted);font-size:12px"></span></div><div class="field"><label>Dirección (opcional)</label><input id="customerAddress" placeholder="Dirección del cliente"></div></div>';document.getElementById("documentType")?.addEventListener("change",renderDocumentFields)}
+function renderDocumentFields(){
+ const e=document.getElementById("documentCustomerFields");if(!e)return;
+ const type=v("documentType")||"BOLETA";
+ const oldDoc=v("customerDoc"),oldAddress=v("customerAddress");
+ e.innerHTML='<div class="form-grid"><div class="field"><label>Documento del cliente</label><input id="customerDoc" placeholder="'+(type==="FACTURA"?"RUC":"DNI / RUC")+'" value="'+esc(oldDoc)+'"></div><div class="field"><label>Dirección (opcional)</label><input id="customerAddress" placeholder="Dirección del cliente" value="'+esc(oldAddress)+'"></div></div>';
+ const select=document.getElementById("documentType");
+ if(select&&!select.dataset.bound){select.dataset.bound="1";select.addEventListener("change",renderDocumentFields)}
+}
 function nextDocumentNumber(type){const prefix=type==="FACTURA"?"F001":type==="BOLETA"?"B001":"NV01";const nums=data.documents.filter(d=>d.type===type).map(d=>parseInt((d.number||"").split("-")[1])||0);return prefix+"-"+String((Math.max(0,...nums)+1)).padStart(8,"0")}
 function finishSale(){
  if(!cart.length)return alert("Agrega productos.");const total=cart.reduce((a,x)=>a+data.products.find(p=>p.id===x.id).price*x.qty,0),received=+(v("received")||total);if(received<total)return alert("El monto recibido es menor al total.");
