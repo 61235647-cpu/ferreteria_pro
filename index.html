@@ -123,7 +123,19 @@ html,body{background:var(--bg);color:var(--ink)}
 .empty{padding:45px;color:#737d89}
 @media(max-width:1100px){.main{padding:0 22px 30px}.sidebar{width:220px}.main{margin-left:220px;width:calc(100% - 220px)}}
 @media(max-width:720px){.sidebar{width:100%}.main{margin-left:0;width:100%;padding:0 14px 25px}}
-</style>
+<style>
+:root{--focus:rgba(91,140,255,.18)}
+body{letter-spacing:.01em}.topbar{position:sticky;top:0;z-index:10;background:rgba(17,19,21,.92);backdrop-filter:blur(12px);padding:0 2px}
+.card-head h3{letter-spacing:-.2px}.card-head .btn{white-space:nowrap}.cards .stat{position:relative;overflow:hidden}.cards .stat:after{content:"";position:absolute;right:-28px;top:-28px;width:90px;height:90px;border-radius:50%;background:rgba(91,140,255,.06)}.stat strong{position:relative;z-index:1}
+.dash-row{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:12px 0;border-bottom:1px solid var(--line)}.dash-row:last-child{border-bottom:0}.dash-row b,.dash-row small{display:block}.dash-row b{font-size:11px;color:#edf0f3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}.dash-row small{font-size:9px;color:var(--muted);margin-top:4px}.dash-row strong{font-size:12px;white-space:nowrap}
+.table td:last-child{width:1%;text-align:right}.table td:last-child .btn{margin-left:4px}.badge{border:1px solid rgba(255,255,255,.05)}
+.sale-layout>.card:first-child{min-width:0}.sale-layout>.card:first-child .card-head{align-items:flex-start}.sale-layout>.card:first-child .card-head>div{max-width:55%}#documentType,#saleClient{min-height:38px}
+.product-card{position:relative}.product-card p{line-height:1.5}.product-card strong{display:inline-block;margin-top:3px}.product-card .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.cart-line span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis}.cart-line .btn{width:34px;padding:0}.total:first-of-type{border-top:1px solid var(--line);padding-top:15px}
+.notice{line-height:1.6}.config-row input,.config-row select{background:#20242a;color:var(--ink);border:1px solid #363d46}.config-row input:focus,.config-row select:focus{outline:0;border-color:#668ff0;box-shadow:0 0 0 3px var(--focus)}
+.modal-box{animation:modalIn .16s ease-out}@keyframes modalIn{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:none}}
+@media(max-width:720px){.topbar{position:static}.topbar h2{font-size:18px}.sale-layout>.card:first-child .card-head{display:block}.sale-layout>.card:first-child .card-head>div{max-width:none;margin-top:10px}.table th,.table td{padding:0 9px}.table td:last-child .btn{margin:2px 0}}
+</style></style>
 </head>
 <body>
 <div id="app" class="app">
@@ -329,7 +341,7 @@ function renderSaleProducts(){
  if(clients&&clients.options.length!==data.clients.length+1){
    clients.innerHTML='<option value="0">Cliente general</option>'+data.clients.map(x=>'<option value="'+x.id+'">'+esc(x.name)+'</option>').join("");
  }
- e.innerHTML=list.map(p=>'<div class="product-card"><h4>'+esc(p.name)+'</h4><p>'+esc(p.sku)+' · Stock: '+p.stock+' · '+esc(p.unit)+'</p><strong>'+money(p.price)+'</strong><br><button class="btn btn-primary" style="margin-top:10px;width:100%" onclick="addCart('+p.id+')">Agregar</button></div>').join("")||'<div class="empty">No se encontraron productos con esa búsqueda.</div>';
+ e.innerHTML=list.map(p=>'<div class="product-card"><h4>'+esc(p.name)+'</h4><p>'+esc(p.sku)+' · Stock: '+p.stock+' · '+esc(p.unit)+'</p><strong>'+money(p.price)+'</strong><br><button class="btn btn-primary" style="margin-top:10px;width:100%" '+(p.stock<=0?'disabled':'')+' onclick="addCart('+p.id+')">'+(p.stock<=0?'Sin stock':'Agregar')+'</button></div>').join("")||'<div class="empty">No se encontraron productos con esa búsqueda.</div>';
  renderCart();
 }
 function addCart(id){const p=data.products.find(x=>x.id===id);if(!p||p.stock<=0)return alert("Producto sin stock.");const x=cart.find(a=>a.id===id);if(x){if(x.qty<p.stock)x.qty++;else return alert("Stock insuficiente")}else cart.push({id,qty:1});renderCart()}
