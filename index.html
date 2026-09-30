@@ -134,181 +134,129 @@
 <div id="modal" class="modal"><div class="modal-box"><div class="modal-head"><h3 id="modalTitle"></h3><button class="close" onclick="closeModal()">×</button></div><div id="modalBody"></div></div></div>
 
 <script>
-const seed={
- users:[{id:1,username:'admin',name:'Administrador',role:'Administrador',status:'Activo'}],
- purchases:[],movements:[],
- products:[
-  {id:1,sku:'FER-001',name:'Martillo de acero 16 oz',unit:'Unidad',stock:18,min:5,price:35},
-  {id:2,sku:'FER-002',name:'Taladro eléctrico 650W',unit:'Unidad',stock:7,min:3,price:189.9},
-  {id:3,sku:'FER-003',name:'Cemento 42.5 kg',unit:'Bolsa',stock:42,min:10,price:31.5},
-  {id:4,sku:'FER-004',name:'Tubo PVC 1/2"',unit:'Unidad',stock:6,min:8,price:8.5},
-  {id:5,sku:'FER-005',name:'Pintura látex blanca 1 galón',unit:'Galón',stock:12,min:4,price:48},
-  {id:6,sku:'FER-006',name:'Juego de llaves 8 piezas',unit:'Juego',stock:9,min:3,price:55}
- ],
- clients:[
-  {id:1,doc:'70881234',name:'Juan Pérez',phone:'987654321',address:'Lima'},
-  {id:2,doc:'10456789',name:'María Torres',phone:'956123789',address:'San Miguel'}
- ],
- employees:[
-  {id:1,doc:'71234567',name:'Carlos Mendoza',role:'Vendedor',phone:'999111222',status:'Activo'},
-  {id:2,doc:'72345678',name:'Ana López',role:'Administrador',phone:'988222333',status:'Activo'}
- ],
- suppliers:[
-  {id:1,doc:'20123456789',name:'Distribuidora Andina SAC',contact:'Luis Ramos',phone:'945555111'},
-  {id:2,doc:'20456789123',name:'Materiales del Sur EIRL',contact:'Rosa Díaz',phone:'933444222'}
- ],
- sales:[]
-};
-let data=JSON.parse(localStorage.getItem('ferreteriaProData'))||seed;
-data.users=data.users||seed.users;data.purchases=data.purchases||[];data.movements=data.movements||[];
-data.users=data.users||[{id:1,username:'admin',name:'Administrador',role:'Administrador',status:'Activo'}];
-data.purchases=data.purchases||[]; data.movements=data.movements||[];
-let cart=[];
-const money=n=>'S/ '+Number(n||0).toFixed(2);
-const save=()=>localStorage.setItem('ferreteriaProData',JSON.stringify(data));
+const seed={users:[{id:1,username:"admin",name:"Administrador",role:"Administrador",status:"Activo"}],purchases:[],movements:[],products:[
+{id:1,sku:"FER-001",name:"Martillo de acero 16 oz",unit:"Unidad",stock:18,min:5,price:35},
+{id:2,sku:"FER-002",name:"Taladro eléctrico 650W",unit:"Unidad",stock:7,min:3,price:189.9},
+{id:3,sku:"FER-003",name:"Cemento 42.5 kg",unit:"Bolsa",stock:42,min:10,price:31.5},
+{id:4,sku:"FER-004",name:"Tubo PVC 1/2",unit:"Unidad",stock:6,min:8,price:8.5},
+{id:5,sku:"FER-005",name:"Pintura látex blanca 1 galón",unit:"Galón",stock:12,min:4,price:48},
+{id:6,sku:"FER-006",name:"Juego de llaves 8 piezas",unit:"Juego",stock:9,min:3,price:55}],
+clients:[{id:1,doc:"70881234",name:"Juan Pérez",phone:"987654321",address:"Lima"},{id:2,doc:"10456789",name:"María Torres",phone:"956123789",address:"San Miguel"}],
+employees:[{id:1,doc:"71234567",name:"Carlos Mendoza",role:"Vendedor",phone:"999111222",status:"Activo"},{id:2,doc:"72345678",name:"Ana López",role:"Administrador",phone:"988222333",status:"Activo"}],
+suppliers:[{id:1,doc:"20123456789",name:"Distribuidora Andina SAC",contact:"Luis Ramos",phone:"945555111"},{id:2,doc:"20456789123",name:"Materiales del Sur EIRL",contact:"Rosa Díaz",phone:"933444222"}],sales:[]};
 
-let currentUser=JSON.parse(localStorage.getItem('ferreCurrentUser')||'null')||{username:'admin',name:'Administrador',role:'Administrador'};
-function login(){try{const u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value;if(u==='admin'&&p==='admin'){currentUser={id:1,username:'admin',name:'Administrador',role:'Administrador',status:'Activo'};data.users=data.users||[currentUser];if(!data.users.some(x=>x.username==='admin'))data.users.unshift(currentUser);localStorage.setItem('ferreCurrentUser',JSON.stringify(currentUser));localStorage.setItem('ferreLogin','1');showApp();return}const found=(data.users||[]).find(x=>x.username===u&&x.status==='Activo');if(found){currentUser=found;localStorage.setItem('ferreCurrentUser',JSON.stringify(found));localStorage.setItem('ferreLogin','1');showApp();return}alert('Usuario o contraseña incorrectos. Demo: admin / admin')}catch(e){console.error(e);alert('No se pudo iniciar sesión. Usa admin / admin.')}}
-function showApp(){document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.add('active');document.getElementById('currentUserName').textContent=currentUser.name+' · '+currentUser.role;refresh()}
-function logout(){localStorage.removeItem('ferreLogin');location.reload()}
-if(localStorage.getItem('ferreLogin'))showApp();
+let data;
+try{data=JSON.parse(localStorage.getItem("ferreteriaProData"))||JSON.parse(JSON.stringify(seed))}catch(e){data=JSON.parse(JSON.stringify(seed))}
+data.users=data.users||JSON.parse(JSON.stringify(seed.users));data.purchases=data.purchases||[];data.movements=data.movements||[];data.sales=data.sales||[];
+let cart=[],currentUser={id:1,username:"admin",name:"Administrador",role:"Administrador",status:"Activo"};
+const money=n=>"S/ "+Number(n||0).toFixed(2);
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const save=()=>localStorage.setItem("ferreteriaProData",JSON.stringify(data));
+const v=id=>document.getElementById(id)?.value||"";
+const field=(label,id,value="",type="text")=>'<div class="field"><label>'+label+'</label><input id="'+id+'" type="'+type+'" value="'+esc(value)+'"></div>';
 
-const titles={dashboard:'Inicio',productos:'Productos',clientes:'Clientes',empleados:'Empleados',proveedores:'Proveedores',compras:'Compras',inventario:'Inventario',usuarios:'Usuarios y roles',ventas:'Nueva venta',reportes:'Reportes',config:'Configuración'};
-document.querySelectorAll('.nav-btn[data-page]').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
-function showPage(id){
- document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
- document.getElementById(id).classList.add('active');
- document.querySelectorAll('.nav-btn[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
- document.getElementById('pageTitle').textContent=titles[id];
- if(id==='ventas')renderSale();
- if(id==='reportes')renderReports();
- if(id==='dashboard')renderDashboard();
- if(id==='compras')renderPurchases();
- if(id==='inventario')renderInventory();
- if(id==='usuarios')renderUsers();
+function login(){
+ const u=v("loginUser").trim(),p=v("loginPass");
+ if(u==="admin"&&p==="admin"){
+  currentUser=data.users.find(x=>x.username==="admin")||{id:1,username:"admin",name:"Administrador",role:"Administrador",status:"Activo"};
+  if(!data.users.some(x=>x.username==="admin"))data.users.unshift(currentUser);
+  localStorage.setItem("ferreCurrentUser",JSON.stringify(currentUser));localStorage.setItem("ferreLogin","1");showApp();return;
+ }
+ const found=data.users.find(x=>x.username===u&&x.status==="Activo");
+ if(found&&p==="admin"){currentUser=found;localStorage.setItem("ferreCurrentUser",JSON.stringify(found));localStorage.setItem("ferreLogin","1");showApp();return}
+ alert("Usuario o contraseña incorrectos. Demo: admin / admin");
 }
-
-function refresh(){renderDashboard();renderProducts();renderClients();renderEmployees();renderSuppliers();renderSale();renderReports();renderPurchases();renderInventory();renderUsers()}
+function showApp(){document.getElementById("login").classList.add("hidden");document.getElementById("app").classList.add("active");document.getElementById("currentUserName").textContent=currentUser.name+" · "+currentUser.role;refresh()}
+function logout(){localStorage.removeItem("ferreLogin");localStorage.removeItem("ferreCurrentUser");location.reload()}
+function showPage(id){
+ document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(id)?.classList.add("active");
+ document.querySelectorAll(".nav-btn").forEach(x=>x.classList.toggle("active",x.dataset.page===id));
+ const titles={dashboard:"Inicio",productos:"Productos",clientes:"Clientes",empleados:"Empleados",proveedores:"Proveedores",compras:"Compras",inventario:"Inventario",usuarios:"Usuarios y roles",ventas:"Nueva venta",reportes:"Reportes",config:"Configuración"};
+ document.getElementById("pageTitle").textContent=titles[id]||"Ferretería Pro";
+ if(id==="ventas")renderSaleProducts();if(id==="productos")renderProducts();if(id==="clientes")renderClients();if(id==="compras")renderPurchases();if(id==="inventario")renderInventory();if(id==="usuarios")renderUsers();
+}
+function refresh(){renderDashboard();renderProducts();renderClients();renderSaleProducts();renderPurchases();renderInventory();renderUsers();renderEmployees();renderSuppliers();renderReports()}
 function renderDashboard(){
- document.getElementById('statProducts').textContent=data.products.length;
- document.getElementById('statLow').textContent=data.products.filter(p=>p.stock<=p.min).length;
- document.getElementById('statClients').textContent=data.clients.length;
- document.getElementById('statSales').textContent=data.sales.length;
- const recent=data.sales.slice(-5).reverse();
- document.getElementById('recentSales').innerHTML=recent.length?'<div class="table-wrap"><table class="table"><tr><th>Fecha</th><th>Cliente</th><th>Total</th></tr>'+recent.map(s=>'<tr><td>'+new Date(s.date).toLocaleDateString()+'</td><td>'+esc(s.client)+'</td><td>'+money(s.total)+'</td></tr>').join('')+'</table></div>':'<div class="empty">Aún no hay ventas registradas.</div>';
- const low=data.products.filter(p=>p.stock<=p.min);
- document.getElementById('lowStock').innerHTML=low.length?low.map(p=>'<div class="cart-line"><span>'+esc(p.name)+'</span><b>'+p.stock+' / mín. '+p.min+'</b></div>').join(''):'<div class="empty">Todo el stock está en niveles normales.</div>';
+ const p=document.getElementById("statProducts");if(p)p.textContent=data.products.length;
+ const l=document.getElementById("statLow");if(l)l.textContent=data.products.filter(x=>x.stock<=x.min).length;
+ const c=document.getElementById("statClients");if(c)c.textContent=data.clients.length;
+ const s=document.getElementById("statSales");if(s)s.textContent=data.sales.length;
 }
 function renderProducts(){
- const q=(document.getElementById('productSearch')?.value||'').toLowerCase();
- const rows=data.products.filter(p=>(p.name+' '+p.sku).toLowerCase().includes(q));
- document.getElementById('productsTable').innerHTML=rows.length?rows.map(p=>{
-  const cls=p.stock===0?'out':p.stock<=p.min?'low':'ok',txt=p.stock===0?'Sin stock':p.stock<=p.min?'Stock bajo':'Disponible';
-  return '<tr><td>'+esc(p.sku)+'</td><td><b>'+esc(p.name)+'</b></td><td>'+esc(p.unit)+'</td><td>'+p.stock+'</td><td>'+p.min+'</td><td>'+money(p.price)+'</td><td><span class="badge '+cls+'">'+txt+'</span></td><td><div class="actions"><button class="btn btn-light" onclick="openProduct('+p.id+')">Editar</button><button class="btn btn-danger" onclick="deleteItem(\'products\','+p.id+')">Eliminar</button></div></td></tr>'
- }).join(''):'<tr><td colspan="8" class="empty">No hay productos.</td></tr>';
+ const e=document.getElementById("productsTable");if(!e)return;
+ e.innerHTML=data.products.map(p=>'<tr><td>'+esc(p.sku)+'</td><td><b>'+esc(p.name)+'</b></td><td>'+esc(p.unit)+'</td><td>'+p.stock+'</td><td>'+money(p.price)+'</td><td><span class="badge '+(p.stock<=p.min?"low":"ok")+'">'+(p.stock<=p.min?"Stock bajo":"Disponible")+'</span></td><td><button class="btn btn-light" onclick="openProduct('+p.id+')">Editar</button> <button class="btn btn-danger" onclick="deleteItem("+"'"+"products"+"',"+p.id+")">Eliminar</button></td></tr>').join("");
 }
 function openProduct(id){
- const p=data.products.find(x=>x.id===id)||{sku:'',name:'',unit:'Unidad',stock:0,min:0,price:0};
- document.getElementById('modalTitle').textContent=id?'Editar producto':'Nuevo producto';
- document.getElementById('modalBody').innerHTML='<div class="form-grid">'+
- field('Código / SKU','pSku',p.sku)+field('Nombre','pName',p.name)+field('Unidad','pUnit',p.unit)+field('Stock','pStock',p.stock,'number')+
- field('Stock mínimo','pMin',p.min,'number')+field('Precio','pPrice',p.price,'number')+'</div><div style="margin-top:16px"><button class="btn btn-primary" onclick="saveProduct('+ (id||0) +')">Guardar</button></div>';
- openModal();
+ const p=data.products.find(x=>x.id===id)||{sku:"",name:"",unit:"Unidad",stock:0,min:5,price:0};
+ document.getElementById("modalTitle").textContent=id?"Editar producto":"Nuevo producto";
+ document.getElementById("modalBody").innerHTML='<div class="form-grid">'+field("SKU","pSku",p.sku)+field("Nombre","pName",p.name)+field("Unidad","pUnit",p.unit)+field("Stock","pStock",p.stock,"number")+field("Stock mínimo","pMin",p.min,"number")+field("Precio","pPrice",p.price,"number")+'</div><button class="btn btn-primary" onclick="saveProduct('+(id||0)+')">Guardar producto</button>';openModal();
 }
 function saveProduct(id){
- const p={id:id||Date.now(),sku:v('pSku'),name:v('pName'),unit:v('pUnit'),stock:+v('pStock'),min:+v('pMin'),price:+v('pPrice')};
- if(!p.sku||!p.name)return alert('Completa código y nombre.');
- if(id)data.products=data.products.map(x=>x.id===id?p:x);else data.products.push(p);
- save();closeModal();refresh();
+ const x={id:id||Date.now(),sku:v("pSku"),name:v("pName"),unit:v("pUnit"),stock:+v("pStock"),min:+v("pMin"),price:+v("pPrice")};
+ if(!x.sku||!x.name)return alert("Completa los datos.");if(id)data.products=data.products.map(p=>p.id===id?x:p);else data.products.push(x);save();closeModal();refresh();
 }
-
-function renderClients(){
- const q=(document.getElementById('clientSearch')?.value||'').toLowerCase();
- const rows=data.clients.filter(x=>(x.doc+' '+x.name).toLowerCase().includes(q));
- document.getElementById('clientsTable').innerHTML=rows.length?rows.map(x=>'<tr><td>'+esc(x.doc)+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.phone)+'</td><td>'+esc(x.address)+'</td><td><button class="btn btn-light" onclick="openPerson(\'client\','+x.id+')">Editar</button> <button class="btn btn-danger" onclick="deleteItem(\'clients\','+x.id+')">Eliminar</button></td></tr>').join(''):'<tr><td colspan="5" class="empty">No hay clientes.</td></tr>';
-}
-function renderEmployees(){
- document.getElementById('employeesTable').innerHTML=data.employees.map(x=>'<tr><td>'+esc(x.doc)+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.role)+'</td><td>'+esc(x.phone)+'</td><td><span class="badge ok">'+esc(x.status)+'</span></td><td><button class="btn btn-light" onclick="openPerson(\'employee\','+x.id+')">Editar</button> <button class="btn btn-danger" onclick="deleteItem(\'employees\','+x.id+')">Eliminar</button></td></tr>').join('')||'<tr><td colspan="6" class="empty">No hay empleados.</td></tr>';
-}
-function renderSuppliers(){
- document.getElementById('suppliersTable').innerHTML=data.suppliers.map(x=>'<tr><td>'+esc(x.doc)+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.contact)+'</td><td>'+esc(x.phone)+'</td><td><button class="btn btn-light" onclick="openPerson(\'supplier\','+x.id+')">Editar</button> <button class="btn btn-danger" onclick="deleteItem(\'suppliers\','+x.id+')">Eliminar</button></td></tr>').join('')||'<tr><td colspan="5" class="empty">No hay proveedores.</td></tr>';
+function renderClients(){renderPeople("clientsTable",data.clients,"client")}
+function renderEmployees(){renderPeople("employeesTable",data.employees,"employee")}
+function renderSuppliers(){renderPeople("suppliersTable",data.suppliers,"supplier")}
+function renderPeople(id,list,type){
+ const e=document.getElementById(id);if(!e)return;e.innerHTML=list.map(x=>'<tr><td>'+esc(x.doc||"")+'</td><td><b>'+esc(x.name)+'</b></td><td>'+esc(x.phone||x.contact||"")+'</td><td><button class="btn btn-light" onclick="openPerson('+"'"+type+"',"+x.id+')">Editar</button> <button class="btn btn-danger" onclick="deleteItem('+"'"+type+"',"+x.id+')">Eliminar</button></td></tr>').join("");
 }
 function openPerson(type,id){
- const map={client:['Cliente','clients',['Documento','Nombre','Teléfono','Dirección']],employee:['Empleado','employees',['DNI','Nombre','Cargo','Teléfono']],supplier:['Proveedor','suppliers',['RUC','Empresa','Contacto','Teléfono']]};
- const m=map[type], arr=data[m[1]], x=arr.find(a=>a.id===id)||{};
- const vals=[x.doc||'',x.name||'',x.phone||'',type==='client'?(x.address||''):type==='employee'?(x.role||''):(x.contact||'')];
- document.getElementById('modalTitle').textContent=(id?'Editar ':'Nuevo ')+m[0];
- document.getElementById('modalBody').innerHTML='<div class="form-grid">'+field(m[2][0],'f1',vals[0])+field(m[2][1],'f2',vals[1])+field(m[2][2], 'f3',vals[2])+field(m[2][3],'f4',vals[3])+'</div><div style="margin-top:16px"><button class="btn btn-primary" onclick="savePerson(\''+type+'\','+(id||0)+')">Guardar</button></div>';
- openModal();
+ const map={client:["Cliente",data.clients],employee:["Empleado",data.employees],supplier:["Proveedor",data.suppliers]},m=map[type],x=m[1].find(a=>a.id===id)||{doc:"",name:"",phone:"",address:"",role:"Vendedor",status:"Activo",contact:""};
+ document.getElementById("modalTitle").textContent=id?"Editar "+m[0].toLowerCase():"Nuevo "+m[0].toLowerCase();
+ document.getElementById("modalBody").innerHTML='<div class="form-grid">'+field("Documento","xDoc",x.doc)+field("Nombre","xName",x.name)+field(type==="supplier"?"Contacto":"Teléfono","xPhone",type==="supplier"?x.contact:x.phone)+field(type==="client"?"Dirección":"Estado","xExtra",type==="client"?x.address:(x.status||"Activo"))+'</div><button class="btn btn-primary" onclick="savePerson('+"'"+type+"',"+(id||0)+')">Guardar</button>';openModal();
 }
 function savePerson(type,id){
- const key={client:'clients',employee:'employees',supplier:'suppliers'}[type], x={id:id||Date.now(),doc:v('f1'),name:v('f2'),phone:v('f3')};
- if(type==='client')x.address=v('f4');if(type==='employee'){x.role=v('f4');x.status='Activo'}if(type==='supplier')x.contact=v('f4');
- if(!x.doc||!x.name)return alert('Completa los campos principales.');
- if(id)data[key]=data[key].map(a=>a.id===id?x:a);else data[key].push(x);
- save();closeModal();refresh();
+ const map={client:"clients",employee:"employees",supplier:"suppliers"},k=map[type],old=data[k].find(x=>x.id===id)||{};
+ const x={...old,id:id||Date.now(),doc:v("xDoc"),name:v("xName")};
+ if(type==="supplier"){x.contact=v("xPhone");x.phone=old.phone||""}else{x.phone=v("xPhone");x.address=type==="client"?v("xExtra"):old.address||"";x.status=type==="employee"?v("xExtra"):"Activo"}
+ if(!x.name)return alert("Completa el nombre.");if(id)data[k]=data[k].map(a=>a.id===id?x:a);else data[k].push(x);save();closeModal();refresh();
 }
-function deleteItem(key,id){if(confirm('¿Eliminar este registro?')){data[key]=data[key].filter(x=>x.id!==id);save();refresh()}}
-
-function renderSale(){
- const s=document.getElementById('saleClient');if(!s)return;
- s.innerHTML='<option value="">Cliente general</option>'+data.clients.map(c=>'<option value="'+c.id+'">'+esc(c.name)+' - '+esc(c.doc)+'</option>').join('');
- renderSaleProducts();renderCart();
-}
+function deleteItem(type,id){const map={products:"products",client:"clients",employee:"employees",supplier:"suppliers"};const k=map[type]||type;if(confirm("¿Eliminar este registro?")){data[k]=data[k].filter(x=>x.id!==id);save();refresh()}}
 function renderSaleProducts(){
- const q=(document.getElementById('saleSearch')?.value||'').toLowerCase();
- const rows=data.products.filter(p=>p.stock>0&&(p.name+' '+p.sku).toLowerCase().includes(q));
- document.getElementById('saleProducts').innerHTML=rows.map(p=>'<div class="product-card"><h4>'+esc(p.name)+'</h4><p>'+esc(p.sku)+' · '+esc(p.unit)+'</p><p>Stock: '+p.stock+'</p><strong>'+money(p.price)+'</strong><br><button class="btn btn-primary" style="margin-top:9px;width:100%" onclick="addCart('+p.id+')">Agregar</button></div>').join('')||'<div class="empty">No hay productos disponibles.</div>';
-}
-function addCart(id){
- const p=data.products.find(x=>x.id===id), line=cart.find(x=>x.id===id);
- if(line){if(line.qty<p.stock)line.qty++;else alert('No hay más stock disponible.')}else cart.push({id,qty:1});
+ const e=document.getElementById("saleProducts");if(!e)return;e.innerHTML=data.products.map(p=>'<div class="product-card"><h4>'+esc(p.name)+'</h4><p>'+esc(p.sku)+' · Stock: '+p.stock+'</p><strong>'+money(p.price)+'</strong><br><button class="btn btn-primary" style="margin-top:9px" onclick="addCart('+p.id+')">Agregar</button></div>').join("");
  renderCart();
 }
-function renderCart(){
- const el=document.getElementById('cart');if(!el)return;
- el.innerHTML=cart.length?cart.map(x=>{const p=data.products.find(a=>a.id===x.id);return '<div class="cart-line"><span>'+esc(p.name)+'<br><small>'+x.qty+' × '+money(p.price)+'</small></span><span><b>'+money(p.price*x.qty)+'</b><br><button onclick="changeQty('+x.id+',-1)">−</button> <button onclick="changeQty('+x.id+',1)">+</button></span></div>'}).join(''):'<div class="empty">Agrega productos al carrito.</div>';
- const total=cart.reduce((a,x)=>a+(data.products.find(p=>p.id===x.id).price*x.qty),0);
- document.getElementById('cartTotal').textContent=money(total);updateChange();
-}
-function changeQty(id,n){const l=cart.find(x=>x.id===id),p=data.products.find(x=>x.id===id);if(!l)return;l.qty+=n;if(l.qty>p.stock)l.qty=p.stock;if(l.qty<=0)cart=cart.filter(x=>x.id!==id);renderCart()}
+function addCart(id){const p=data.products.find(x=>x.id===id);if(!p||p.stock<=0)return alert("Producto sin stock.");const x=cart.find(a=>a.id===id);if(x){if(x.qty<p.stock)x.qty++;else return alert("Stock insuficiente")}else cart.push({id,qty:1});renderCart()}
+function changeQty(id,d){const x=cart.find(a=>a.id===id),p=data.products.find(a=>a.id===id);if(!x)return;x.qty+=d;if(x.qty<=0)cart=cart.filter(a=>a.id!==id);else if(x.qty>p.stock)x.qty=p.stock;renderCart()}
 function clearCart(){cart=[];renderCart()}
-function updateChange(){const total=cart.reduce((a,x)=>a+data.products.find(p=>p.id===x.id).price*x.qty,0);const rec=+(document.getElementById('received')?.value||0);document.getElementById('change').textContent=money(Math.max(0,rec-total))}
+function renderCart(){
+ const e=document.getElementById("cartItems");if(!e)return;e.innerHTML=cart.map(x=>{const p=data.products.find(a=>a.id===x.id);return '<div class="cart-line"><span>'+esc(p.name)+' × '+x.qty+'<br><small>'+money(p.price*x.qty)+'</small></span><span><button class="btn btn-light" onclick="changeQty('+x.id+',-1)">−</button> <button class="btn btn-light" onclick="changeQty('+x.id+',1)">+</button></span></div>'}).join("")||'<div class="empty">Agrega productos a la venta.</div>';
+ const total=cart.reduce((a,x)=>a+(data.products.find(p=>p.id===x.id).price*x.qty),0),t=document.getElementById("saleTotal");if(t)t.textContent=money(total);updateChange();
+}
+function updateChange(){const total=cart.reduce((a,x)=>a+(data.products.find(p=>p.id===x.id)?.price||0)*x.qty,0),rec=+(v("amountReceived")||0),e=document.getElementById("changeAmount");if(e)e.textContent=money(Math.max(0,rec-total))}
 function finishSale(){
- if(!cart.length)return alert('Agrega al menos un producto.');
- const total=cart.reduce((a,x)=>a+data.products.find(p=>p.id===x.id).price*x.qty,0),rec=+(document.getElementById('received').value||0);
- if(rec<total)return alert('El pago recibido es menor que el total.');
- const cid=+document.getElementById('saleClient').value,client=data.clients.find(c=>c.id===cid);
- cart.forEach(x=>{const p=data.products.find(p=>p.id===x.id);p.stock-=x.qty;data.movements.push({id:Date.now()+Math.random(),date:new Date().toISOString(),product:p.name,type:'Salida',qty:x.qty,motive:'Venta',user:currentUser.username})});
- data.sales.push({id:Date.now(),date:new Date().toISOString(),client:client?.name||'Cliente general',payment:document.getElementById('payment').value,total,received:rec,items:cart.map(x=>({...x}))});
- save();cart=[];document.getElementById('received').value='';alert('Venta registrada correctamente. Vuelto: '+money(rec-total));refresh();
+ if(!cart.length)return alert("Agrega productos.");const total=cart.reduce((a,x)=>a+data.products.find(p=>p.id===x.id).price*x.qty,0),received=+(v("amountReceived")||total);if(received<total)return alert("El monto recibido es menor al total.");
+ const client=data.clients.find(x=>x.id===+(v("saleClient")||0));const payment=v("paymentMethod")||"Efectivo";
+ data.sales.push({id:Date.now(),date:new Date().toISOString(),client:client?.name||"Cliente general",payment,total,received,items:cart.map(x=>({id:x.id,qty:x.qty}))});
+ cart.forEach(x=>{const p=data.products.find(a=>a.id===x.id);p.stock-=x.qty;data.movements.push({id:Date.now()+Math.random(),date:new Date().toISOString(),product:p.name,type:"Salida",qty:x.qty,motive:"Venta",user:currentUser.username})});
+ save();const sale=data.sales[data.sales.length-1];cart=[];refresh();renderCart();alert("Venta registrada correctamente.");viewSale(sale.id);
 }
-function renderReports(){
- const total=data.sales.reduce((a,s)=>a+s.total,0);document.getElementById('reportTotal').textContent=money(total);document.getElementById('reportCount').textContent=data.sales.length;
- document.getElementById('salesTable').innerHTML=data.sales.slice().reverse().map(s=>'<tr><td>'+new Date(s.date).toLocaleString()+'</td><td>'+esc(s.client)+'</td><td>'+esc(s.payment)+'</td><td>'+money(s.total)+'</td><td><button class="btn btn-light" onclick="viewSale('+s.id+')">Ver</button></td></tr>').join('')||'<tr><td colspan="5" class="empty">No hay ventas.</td></tr>';
-}
-function viewSale(id){const s=data.sales.find(x=>x.id===id);document.getElementById('modalTitle').textContent='Detalle de venta';document.getElementById('modalBody').innerHTML='<div class="invoice"><h3>FERRETERÍA PRO</h3><p><b>Fecha:</b> '+new Date(s.date).toLocaleString()+'</p><p><b>Cliente:</b> '+esc(s.client)+'</p><hr>'+s.items.map(i=>{const p=data.products.find(x=>x.id===i.id);return '<div class="cart-line"><span>'+esc(p?.name||'Producto')+' × '+i.qty+'</span><b>'+money((p?.price||0)*i.qty)+'</b></div>'}).join('')+'<div class="total"><span>Total</span><span>'+money(s.total)+'</span></div><button class="btn btn-primary" style="margin-top:15px;width:100%" onclick="printReceipt(data.sales.find(x=>x.id==='+s.id+'))">🖨️ Imprimir boleta / factura</button></div>';openModal()}
-function exportCSV(){let csv='Fecha,Cliente,Método de pago,Total\\n'+data.sales.map(s=>[new Date(s.date).toLocaleString(),s.client,s.payment,s.total.toFixed(2)].map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='ventas-ferreteria-pro.csv';a.click()}
-function saveConfig(){alert('Configuración guardada.')}
-function resetData(){if(confirm('Se borrarán los datos actuales y se restaurarán los datos demo.')){data=JSON.parse(JSON.stringify(seed));save();refresh();}}
-function field(label,id,value,type='text'){return '<div class="field"><label>'+label+'</label><input id="'+id+'" type="'+type+'" value="'+esc(String(value??''))+'"></div>'}
-function v(id){return document.getElementById(id).value.trim()}
-function esc(s){return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}
-function openModal(){document.getElementById('modal').classList.add('show')}
-function closeModal(){document.getElementById('modal').classList.remove('show')}
-document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
-
-function renderPurchases(){const e=document.getElementById('purchasesTable');if(!e)return;e.innerHTML=data.purchases.slice().reverse().map(x=>'<tr><td>'+new Date(x.date).toLocaleString()+'</td><td>'+esc(x.supplier)+'</td><td>'+x.items.length+'</td><td>'+money(x.total)+'</td><td><span class="badge ok">Registrada</span></td><td><button class="btn btn-light" onclick="viewPurchase('+x.id+')">Ver</button></td></tr>').join('')||'<tr><td colspan="6" class="empty">No hay compras.</td></tr>'}
-function openPurchase(){document.getElementById('modalTitle').textContent='Nueva compra';document.getElementById('modalBody').innerHTML='<div class="field"><label>Proveedor</label><select id="buySupplier">'+data.suppliers.map(s=>'<option value="'+s.id+'">'+esc(s.name)+'</option>').join('')+'</select></div><div class="field"><label>Producto</label><select id="buyProduct">'+data.products.map(p=>'<option value="'+p.id+'">'+esc(p.name)+'</option>').join('')+'</select></div>'+field('Cantidad','buyQty',1,'number')+field('Costo unitario','buyCost',0,'number')+'<button class="btn btn-primary" onclick="savePurchase()">Registrar compra</button>';openModal()}
-function savePurchase(){const s=data.suppliers.find(x=>x.id===+v('buySupplier')),p=data.products.find(x=>x.id===+v('buyProduct')),q=+v('buyQty'),cost=+v('buyCost');if(!s||!p||q<=0||cost<0)return alert('Completa los datos.');p.stock+=q;data.purchases.push({id:Date.now(),date:new Date().toISOString(),supplier:s.name,total:q*cost,items:[{id:p.id,qty:q,cost:cost}]});data.movements.push({id:Date.now()+1,date:new Date().toISOString(),product:p.name,type:'Entrada',qty:q,motive:'Compra a proveedor',user:currentUser.username});save();closeModal();refresh();alert('Compra registrada y stock actualizado.')}
-function viewPurchase(id){const x=data.purchases.find(a=>a.id===id);document.getElementById('modalTitle').textContent='Detalle de compra';document.getElementById('modalBody').innerHTML='<div class="invoice"><h3>COMPRA</h3><p><b>Proveedor:</b> '+esc(x.supplier)+'</p>'+x.items.map(i=>{const p=data.products.find(a=>a.id===i.id);return '<div class="cart-line"><span>'+esc(p?.name||'Producto')+' × '+i.qty+'</span><b>'+money(i.qty*i.cost)+'</b></div>'}).join('')+'<div class="total"><span>Total</span><span>'+money(x.total)+'</span></div></div>';openModal()}
-function openStockMovement(){document.getElementById('modalTitle').textContent='Entrada de inventario';document.getElementById('modalBody').innerHTML='<div class="field"><label>Producto</label><select id="movProduct">'+data.products.map(p=>'<option value="'+p.id+'">'+esc(p.name)+'</option>').join('')+'</select></div>'+field('Cantidad','movQty',1,'number')+field('Motivo','movReason','Ingreso de mercadería')+'<button class="btn btn-warning" onclick="saveStockMovement()">Registrar</button>';openModal()}
-function saveStockMovement(){const p=data.products.find(x=>x.id===+v('movProduct')),q=+v('movQty');if(!p||q<=0)return alert('Cantidad inválida.');p.stock+=q;data.movements.push({id:Date.now(),date:new Date().toISOString(),product:p.name,type:'Entrada',qty:q,motive:v('movReason'),user:currentUser.username});save();closeModal();refresh();alert('Entrada registrada.')}
-function renderInventory(){const e=document.getElementById('inventoryTable');if(!e)return;document.getElementById('stockInTotal').textContent=data.movements.filter(x=>x.type==='Entrada').reduce((a,x)=>a+x.qty,0);document.getElementById('stockOutTotal').textContent=data.movements.filter(x=>x.type==='Salida').reduce((a,x)=>a+x.qty,0);document.getElementById('movementTotal').textContent=data.movements.length;e.innerHTML=data.movements.slice().reverse().map(m=>'<tr><td>'+new Date(m.date).toLocaleString()+'</td><td>'+esc(m.product)+'</td><td>'+m.type+'</td><td>'+m.qty+'</td><td>'+esc(m.motive)+'</td><td>'+esc(m.user)+'</td></tr>').join('')||'<tr><td colspan="6" class="empty">No hay movimientos.</td></tr>'}
-function renderUsers(){const e=document.getElementById('usersTable');if(!e)return;e.innerHTML=data.users.map(u=>'<tr><td>'+esc(u.username)+'</td><td>'+esc(u.name)+'</td><td><span class="badge">'+esc(u.role)+'</span></td><td>'+esc(u.status)+'</td><td><button class="btn btn-light" onclick="openUser('+u.id+')">Editar</button> <button class="btn btn-danger" onclick="deleteUser('+u.id+')">Eliminar</button></td></tr>').join('')}
-function openUser(id){const u=data.users.find(x=>x.id===id)||{username:'',name:'',role:'Vendedor',status:'Activo'};document.getElementById('modalTitle').textContent=id?'Editar usuario':'Nuevo usuario';document.getElementById('modalBody').innerHTML=field('Usuario','uUser',u.username)+field('Nombre','uName',u.name)+'<div class="field"><label>Rol</label><select id="uRole"><option>Administrador</option><option>Vendedor</option><option>Almacén</option></select></div><div class="field"><label>Estado</label><select id="uStatus"><option>Activo</option><option>Inactivo</option></select></div><button class="btn btn-primary" onclick="saveUser('+(id||0)+')">Guardar</button>';openModal()}
-function saveUser(id){const x={id:id||Date.now(),username:v('uUser'),name:v('uName'),role:document.getElementById('uRole').value,status:document.getElementById('uStatus').value};if(!x.username||!x.name)return alert('Completa usuario y nombre.');if(id)data.users=data.users.map(u=>u.id===id?x:u);else data.users.push(x);save();closeModal();renderUsers()}
-function deleteUser(id){if(id===1)return alert('No se puede eliminar el administrador principal.');if(confirm('¿Eliminar usuario?')){data.users=data.users.filter(u=>u.id!==id);save();renderUsers()}}
-function printReceipt(s){const w=window.open('','_blank','width=650,height=750');if(!w)return alert('Permite ventanas emergentes para imprimir el comprobante.');w.document.write('<html><head><title>Comprobante</title><style>body{font-family:Arial;padding:30px}.ticket{max-width:560px;margin:auto}table{width:100%;border-collapse:collapse}td{padding:8px;border-bottom:1px solid #ddd}.total{font-size:20px;font-weight:bold;text-align:right;margin-top:15px}</style></head><body><div class="ticket"><h2 style="text-align:center">FERRETERÍA PRO</h2><p>Fecha: '+new Date(s.date).toLocaleString()+'</p><p>Cliente: '+esc(s.client)+'</p><table>'+s.items.map(i=>{const p=data.products.find(x=>x.id===i.id);return '<tr><td>'+esc(p?.name||'Producto')+' x '+i.qty+'</td><td>'+money((p?.price||0)*i.qty)+'</td></tr>'}).join('')+'</table><div class="total">TOTAL: '+money(s.total)+'</div></div></body></html>');w.document.close();w.print()}\n</script>
+function viewSale(id){const s=data.sales.find(x=>x.id===id);if(!s)return;document.getElementById("modalTitle").textContent="Comprobante de venta";document.getElementById("modalBody").innerHTML='<div class="invoice"><h3>FERRETERÍA PRO</h3><p><b>Cliente:</b> '+esc(s.client)+'</p><p><b>Fecha:</b> '+new Date(s.date).toLocaleString()+'</p>'+s.items.map(i=>{const p=data.products.find(x=>x.id===i.id);return '<div class="cart-line"><span>'+esc(p?.name||"Producto")+' × '+i.qty+'</span><b>'+money((p?.price||0)*i.qty)+'</b></div>'}).join("")+'<div class="total"><span>Total</span><span>'+money(s.total)+'</span></div><button class="btn btn-primary" style="width:100%;margin-top:15px" onclick="printReceipt('+s.id+')">Imprimir comprobante</button></div>';openModal()}
+function printReceipt(id){const s=data.sales.find(x=>x.id===id);if(!s)return;const w=window.open("","_blank");if(!w)return alert("Permite ventanas emergentes.");w.document.write("<html><body style='font-family:Arial;padding:30px'><h2>FERRETERÍA PRO</h2><p>Cliente: "+esc(s.client)+"</p><p>Fecha: "+new Date(s.date).toLocaleString()+"</p>"+s.items.map(i=>{const p=data.products.find(x=>x.id===i.id);return "<p>"+esc(p?.name||"Producto")+" x "+i.qty+" — "+money((p?.price||0)*i.qty)+"</p>"}).join("")+"<h2>Total: "+money(s.total)+"</h2></body></html>");w.document.close();w.print()}
+function renderPurchases(){const e=document.getElementById("purchasesTable");if(!e)return;e.innerHTML=data.purchases.slice().reverse().map(x=>'<tr><td>'+new Date(x.date).toLocaleString()+'</td><td>'+esc(x.supplier)+'</td><td>'+x.items.length+'</td><td>'+money(x.total)+'</td><td><span class="badge ok">Registrada</span></td><td><button class="btn btn-light" onclick="viewPurchase('+x.id+')">Ver</button></td></tr>').join("")||'<tr><td colspan="6" class="empty">No hay compras.</td></tr>'}
+function openPurchase(){document.getElementById("modalTitle").textContent="Nueva compra";document.getElementById("modalBody").innerHTML='<div class="field"><label>Proveedor</label><select id="buySupplier">'+data.suppliers.map(s=>'<option value="'+s.id+'">'+esc(s.name)+'</option>').join("")+'</select></div><div class="field"><label>Producto</label><select id="buyProduct">'+data.products.map(p=>'<option value="'+p.id+'">'+esc(p.name)+'</option>').join("")+'</select></div>'+field("Cantidad","buyQty",1,"number")+field("Costo unitario","buyCost",0,"number")+'<button class="btn btn-primary" onclick="savePurchase()">Registrar compra</button>';openModal()}
+function savePurchase(){const s=data.suppliers.find(x=>x.id===+v("buySupplier")),p=data.products.find(x=>x.id===+v("buyProduct")),q=+v("buyQty"),cost=+v("buyCost");if(!s||!p||q<=0)return alert("Completa los datos.");p.stock+=q;data.purchases.push({id:Date.now(),date:new Date().toISOString(),supplier:s.name,total:q*cost,items:[{id:p.id,qty:q,cost}]});data.movements.push({id:Date.now()+1,date:new Date().toISOString(),product:p.name,type:"Entrada",qty:q,motive:"Compra a proveedor",user:currentUser.username});save();closeModal();refresh();alert("Compra registrada.")}
+function viewPurchase(id){const x=data.purchases.find(a=>a.id===id);if(!x)return;document.getElementById("modalTitle").textContent="Detalle de compra";document.getElementById("modalBody").innerHTML='<div class="invoice"><h3>COMPRA</h3><p>Proveedor: '+esc(x.supplier)+'</p><p>Fecha: '+new Date(x.date).toLocaleString()+'</p>'+x.items.map(i=>{const p=data.products.find(a=>a.id===i.id);return '<div class="cart-line"><span>'+esc(p?.name||"Producto")+' × '+i.qty+'</span><b>'+money(i.qty*i.cost)+'</b></div>'}).join("")+'<div class="total"><span>Total</span><span>'+money(x.total)+'</span></div></div>';openModal()}
+function openStockMovement(){document.getElementById("modalTitle").textContent="Entrada de inventario";document.getElementById("modalBody").innerHTML='<div class="field"><label>Producto</label><select id="movProduct">'+data.products.map(p=>'<option value="'+p.id+'">'+esc(p.name)+'</option>').join("")+'</select></div>'+field("Cantidad","movQty",1,"number")+field("Motivo","movReason","Ingreso de mercadería")+'<button class="btn btn-primary" onclick="saveStockMovement()">Registrar entrada</button>';openModal()}
+function saveStockMovement(){const p=data.products.find(x=>x.id===+v("movProduct")),q=+v("movQty");if(!p||q<=0)return alert("Cantidad inválida.");p.stock+=q;data.movements.push({id:Date.now(),date:new Date().toISOString(),product:p.name,type:"Entrada",qty:q,motive:v("movReason"),user:currentUser.username});save();closeModal();refresh();alert("Entrada registrada.")}
+function renderInventory(){const e=document.getElementById("inventoryTable");if(!e)return;document.getElementById("stockInTotal").textContent=data.movements.filter(x=>x.type==="Entrada").reduce((a,x)=>a+x.qty,0);document.getElementById("stockOutTotal").textContent=data.movements.filter(x=>x.type==="Salida").reduce((a,x)=>a+x.qty,0);document.getElementById("movementTotal").textContent=data.movements.length;e.innerHTML=data.movements.slice().reverse().map(m=>'<tr><td>'+new Date(m.date).toLocaleString()+'</td><td>'+esc(m.product)+'</td><td>'+m.type+'</td><td>'+m.qty+'</td><td>'+esc(m.motive)+'</td><td>'+esc(m.user)+'</td></tr>').join("")||'<tr><td colspan="6" class="empty">No hay movimientos.</td></tr>'}
+function renderUsers(){const e=document.getElementById("usersTable");if(!e)return;e.innerHTML=data.users.map(u=>'<tr><td>'+esc(u.username)+'</td><td>'+esc(u.name)+'</td><td><span class="badge">'+esc(u.role)+'</span></td><td>'+esc(u.status)+'</td><td><button class="btn btn-light" onclick="openUser('+u.id+')">Editar</button> <button class="btn btn-danger" onclick="deleteUser('+u.id+')">Eliminar</button></td></tr>').join("")}
+function openUser(id){const u=data.users.find(x=>x.id===id)||{username:"",name:"",role:"Vendedor",status:"Activo"};document.getElementById("modalTitle").textContent=id?"Editar usuario":"Nuevo usuario";document.getElementById("modalBody").innerHTML=field("Usuario","uUser",u.username)+field("Nombre","uName",u.name)+'<div class="field"><label>Rol</label><select id="uRole"><option>Administrador</option><option>Vendedor</option><option>Almacén</option></select></div><div class="field"><label>Estado</label><select id="uStatus"><option>Activo</option><option>Inactivo</option></select></div><button class="btn btn-primary" onclick="saveUser('+(id||0)+')">Guardar usuario</button>';openModal()}
+function saveUser(id){const x={id:id||Date.now(),username:v("uUser"),name:v("uName"),role:v("uRole"),status:v("uStatus")};if(!x.username||!x.name)return alert("Completa los datos.");if(id)data.users=data.users.map(u=>u.id===id?x:u);else data.users.push(x);save();closeModal();renderUsers()}
+function deleteUser(id){if(id===1)return alert("No se puede eliminar el administrador principal.");if(confirm("¿Eliminar usuario?")){data.users=data.users.filter(u=>u.id!==id);save();renderUsers()}}
+function renderReports(){const e=document.getElementById("reportsTable");if(!e)return;e.innerHTML=data.sales.slice().reverse().map(s=>'<tr><td>'+new Date(s.date).toLocaleString()+'</td><td>'+esc(s.client)+'</td><td>'+esc(s.payment)+'</td><td>'+money(s.total)+'</td><td><button class="btn btn-light" onclick="viewSale('+s.id+')">Ver</button></td></tr>').join("")}
+function renderSaleProducts(){const e=document.getElementById("saleProducts");if(!e)return;e.innerHTML=data.products.map(p=>'<div class="product-card"><h4>'+esc(p.name)+'</h4><p>'+esc(p.sku)+' · Stock: '+p.stock+'</p><strong>'+money(p.price)+'</strong><br><button class="btn btn-primary" style="margin-top:9px" onclick="addCart('+p.id+')">Agregar</button></div>').join("");renderCart()}
+function exportCSV(){const csv="Fecha,Cliente,Método de pago,Total\n"+data.sales.map(s=>[new Date(s.date).toLocaleString(),s.client,s.payment,s.total.toFixed(2)].join(",")).join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="ventas-ferreteria-pro.csv";a.click()}
+function saveConfig(){alert("Configuración guardada.")}
+function resetData(){if(confirm("¿Restaurar datos demo?")){data=JSON.parse(JSON.stringify(seed));save();refresh();alert("Datos restaurados.")}}
+function openModal(){document.getElementById("modal").classList.add("show")}
+function closeModal(){document.getElementById("modal").classList.remove("show")}
+document.addEventListener("click",e=>{if(e.target.matches(".modal"))closeModal()});
+document.querySelectorAll(".nav-btn").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
+const received=document.getElementById("amountReceived");if(received)received.addEventListener("input",updateChange);
+if(localStorage.getItem("ferreLogin"))showApp();
+else{document.getElementById("login").classList.remove("hidden");document.getElementById("app").classList.remove("active")}
+</script>
 </body>
 </html>
